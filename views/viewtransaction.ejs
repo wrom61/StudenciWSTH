@@ -1,0 +1,44 @@
+<%- include('./partials/header.ejs') %>
+
+<div class="container col-xl-10 col-xxl-8 px-4 py-5">
+
+<div class="view-user p-5">
+
+  <div class="row mb-5">
+    <div class="col text-center">
+      <h3 class="text-white fw-bold"><%= student.first_name %> <%= student.last_name %></h3>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <!-- class="text-warning" style="border-bottom: 2px solid red;" -->
+      <table class="table text-white">
+        <thead>
+          <tr class="text-warning" style="border-bottom: 2px solid red;">
+            <th scope="col">Data</th>
+            <th scope="col">Rodzaj</th>
+            <th scope="col">Dokument</th>
+            <th scope="col" class="text-end">Kwota</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><%= formattedDate %></td>
+            <td><%= type %></td>
+            <td><%= transData[0].document %></td>
+            <td class="text-end"><%= formattedAmount %></td>
+          </tr>
+        </tbody>
+      </table>      
+    </div>
+    <a href="/profile/id/<%= student.id %>" class="btn btn-warning">Wróć</a>
+    
+  </div>
+
+
+  </div>
+
+
+</div>

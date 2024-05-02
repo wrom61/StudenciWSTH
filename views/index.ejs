@@ -1,0 +1,27 @@
+
+  <%- include('./partials/header.ejs') %>
+  <div class="container mt-5">
+    <div class="p-4 shadow-4 rounded-3" style="background-color: hsl(0, 0%, 94%);">
+      <h2>Czesne uczniów/studentów WSTH!</h2>
+      <p>W tym serwisie możesz zobaczyć swoje rozliczenia finansowe z WSTH.</p>
+    
+      <hr class="my-4" />
+    
+      <p>Przechodząc dalej akceptujesz informację, że strona korzysta z ciasteczek.</p>
+      
+      <% if (!user) { %>
+        <a href="/login"><button type="button" class="btn btn-primary">Logowanie</button></a>
+      <% } else if ( user.level === 1) { %>
+        <a href="/profile/id/<%= user.id %>"><button type="button" class="btn btn-primary">Profil i dane finansowe</button></a>
+        <!-- <a href="/profile/level/1/studentId/<%= user.id %>"><button type="button" class="btn btn-primary">Profil i dane finansowe</button></a> -->
+      <% } else { %>
+        <a href="/profile/id/<%= user.id %>"><button type="button" class="btn btn-primary">Profil i dane finansowe</button></a>
+        <a href="/register"><button type="button" class="btn btn-secondary">Rejestracja</button></a>
+      <% } %>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+body {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  background-image: url('./images/bgImage.jpeg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+table {
+  color: #fff;
+}
+
+nav {
+  background-color: #489207;
+  /* background-image: url('./images/bgnav.jpg'); */
+  color: #fff;
+  padding: 30px 60px;
+  display: flex;
+  justify-content: space-between;
+}
+
+nav ul {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+nav li {
+  list-style: none;
+}
+
+nav li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px 8px;
+}
+
+nav li a:hover {
+  color: yellow;
+  text-decoration: none;
+}
+
+.form-title {
+  color: blueviolet;
+  margin-top: 0px;
+  margin-bottom: 20px;
+}
+
+.avatar-ctn {
+  background-color: orange;
+  text-align: center;
+}
+
+.avatar {
+  width: 65%;
+  border-bottom: 1px solid rgba(0,0,0,0,125);
+}
+
+
+[data-title]:hover:after {
+  opacity: 1;
+  transition: all 0.1s ease 0.5s;
+  visibility: visible;
+}
+
+[data-title]:after {
+  content: attr(data-title);
+  background-color: rgb(181, 222, 235);
+  color: #111;
+  font-size: 100%;
+  position: absolute;
+  padding: 1px 5px 2px 5px;
+  bottom: -1.6em;
+  left: 100%;
+  white-space: nowrap;
+  box-shadow: 1px 1px 3px #222222;
+  opacity: 0;
+  border: 1px solid #111111;
+  z-index: 99999;
+  visibility: hidden;
+}
+[data-title] {
+  position: relative;
+}
+
+[data-title="Usuń studenta"],
+[data-title="Usuń transakcję"],
+[data-title="Usuń zapis"] {
+  background-color: red;
+  color: white;
+}
+
+[data-title="Dodaj transakcję"],
+[data-title="Zobacz transakcję"],
+[data-title="Zobacz zapis"] {
+  background-color: green;
+  color: white;
+}
+
+[data-title="Dodaj zapis"] {
+  background-color: lightseagreen;
+  color: white;
+}
+
+[data-title="Zobacz transakcje studenta"] {
+  background-color: rgb(11, 44, 134);
+  color: white;
+}
+
+[data-title="Edytuj studenta"],
+[data-title="Edytuj transakcję"],
+[data-title="Edytuj zapis"] {
+  background-color: blueviolet;
+  color: white;
+}
+
+[data-title="Szukaj (ENTER)"] {
+  background-color: cornflowerblue;
+  color: white;
+}
+
+[data-title="Wyczyść (ESC)"] {
+  background-color: rgb(243, 115, 215);
+  color: white;
+}
+
+label {
+  color: green;
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder { /* Edge 12-18 */
+  color: red;
+}
+
+.custom-select-addtransaction {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 10px 38px 10px 16px;
+  background-size: 10px;
+  transition: border-color .1s ease-in-out,box-shadow .1s ease-in-out;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 18px;
+}
+
+.custom-select-addtransaction:hover {
+  border: 1px solid #999;
+}
+.custom-select-addtransaction:focus {
+  border: 1px solid #999;
+  box-shadow: 0 3px 5px 0 rgba(81, 173, 65, 0.2);
+  outline: none;
+}
+
+#comment {
+  /* width: 300px; */
+  height: 150px;
+}

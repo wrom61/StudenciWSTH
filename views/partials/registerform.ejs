@@ -1,0 +1,155 @@
+
+<h2 class="form-title"><%= formTitle %></h2>
+<div class="d-flex">
+  <div class="form-floating mb-3 col-6">
+    <input type="text" class="form-control" id="last_name" name="last_name"
+    value="<%= student.last_name %>">
+    <label for="last_name">Nazwisko <span class="text-danger">*</span></label>
+  </div>
+  <div class="form-floating mb-3 col-6">
+    <input type="text" class="form-control" id="first_name" name="first_name" 
+    value="<%= student.first_name %>">
+    <label for="first_name">Imię <span class="text-danger">*</span></label>
+  </div>
+</div>
+
+<div class="d-flex">
+  <div class="form-floating mb-3 col-6">
+    <input type="text" class="form-control" id="userNick" name="userNick" 
+    value="<%= student.userNick %>">
+    <label for="userNick">Nazwa użytkownika/Login <span class="text-danger">*</span></label>
+  </div>
+  <div class="form-floating mb-3 col-6">
+    <input type="email" class="form-control" id="email" name="email"
+    value="<%= student.email %>">
+    <label for="email">E-mail</label>
+  </div>
+</div>
+<% if (regist == 1) { %>
+  <div class="d-flex">
+    <div class="form-floating mb-3 col-6"> 
+      <input type="password" class="form-control" id="password" name="password" value="<%= student.password %>">
+      <label for="password">Hasło <span class="text-danger">*</span></label>
+    </div>
+    <div class="form-floating mb-3 col-6"> 
+      <input type="password" class="form-control" id="password1" name="password1" value="<%= student.password1 %>">
+      <label for="password1">Powtórz hasło <span class="text-danger">*</span></label>
+    </div>
+  </div>
+<% } %>
+
+
+<div class="d-flex">  
+  <div class="form-floating mb-3 col-5">
+    <input type="text" class="form-control" id="address1" name="address1"
+    value="<%= student.address1 %>">
+    <label for="address1">&nbsp;Adres</label>
+  </div>
+  
+  <div class="form-floating mb-3 col-2">
+    <input type="text" class="form-control" id="zipcode1" name="zipcode1" 
+    value="<%= student.zipCode1 %>">
+    <label for="zipcode1">Kod</label>
+  </div>
+  <div class="form-floating mb-3 col-5">
+    <input type="text" class="form-control" id="town1" name="town1" 
+    value="<%= student.town1 %>">
+    <label for="town1">Miasto</label>
+  </div>   
+</div>
+
+<div class="d-flex">  
+  <div class="form-floating mb-3 col-5">
+    <input type="text" class="form-control" id="address2" name="address2"
+    value="<%= student.address2 %>">
+    <label for="address2">&nbsp;Adres 2</label>
+  </div>
+  
+  <div class="form-floating mb-3 col-2">
+    <input type="text" class="form-control" id="zipcode2" name="zipcode2" 
+    value="<%= student.zipCode2 %>">
+    <label for="zipcode2">Kod 2</label>
+  </div>
+  <div class="form-floating mb-3 col-5">
+    <input type="text" class="form-control" id="town2" name="town2" 
+    value="<%= student.town2 %>">
+    <label for="town2">Miasto 2</label>
+  </div>   
+</div>
+
+<div class="d-flex">
+  <div class="form-floating mb-3 col-6">
+    <input type="text" class="form-control" id="phone" name="phone"
+    value="<%= student.phone %>">
+    <label for="phone">Telefon</label>
+  </div>
+</div>
+
+<% if(user.level > 3) { %>
+
+<hr class="text-danger">
+
+<div class="d-flex mb-3">
+  <div class="col-6">
+    <label for="level">&nbsp;&nbsp;Poziom dostępu</label>
+    <select class="custom-select-addtransaction fs-6 w-100 text-center" name="level" id="level" style="padding: 6px 12px">
+      <option value="1">Student</option>
+      <option value="2">Przeglądający</option>
+      <option value="3">Studenci/Należności</option>
+      <option value="4">Administrator</option>    
+    </select>
+  </div>
+  <div class="col-6">
+    <label for="level">&nbsp;&nbsp;Instytut</label>
+    <select class="custom-select-addtransaction fs-6 w-100 text-center" name="institute" id="institute" style="padding: 6px 12px">
+      <option value="0">Wszystkie</option>
+      <option value="1">IPZ</option>      
+    </select>
+  </div>
+</div>
+
+<div class="d-flex mb-3">
+  <div class="col-6">
+    <label for="level">&nbsp;&nbsp;Punkt konsultacyjny</label>
+    <select class="custom-select-addtransaction fs-6 w-100 text-center" name="branch" id="branch" style="padding: 6px 12px">
+      <option value="0">Wszystkie</option>
+      <option value="1">Podkowa Leśna</option>
+      <option value="2">Nysa</option>
+    </select>
+  </div>
+</div>
+
+<hr class="text-danger">
+
+<% } %>
+
+<div class="form-floating mb-3 ">
+  <textarea class="col-12 form-control" name="comment" id="comment" rows="10"><%= student.comment %></textarea>
+  <label for="comment">Uwagi:</label>
+</div>
+
+
+
+
+<div class="row">
+  <div class="col col-6">
+    <% if (student.length === 0) { %>
+      <a href="/register"><button class="w-100 btn btn-lg btn-primary" type="submit"><%= buttonTitle %></button></a>       
+    <% } else { %>
+      <a href="/register/<%= student.id %>"><button class="w-100 btn btn-lg btn-primary" type="submit"><%= buttonTitle %></button></a>  
+    <% } %>
+  </div>
+  <div class="col col-6">
+    <a href="/"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
+  </div>
+</div>
+
+
+
+
+<% if (messageerror) { %>
+  <h4 class="alert alert-danger text-center text-danger mt-2"><%= messageerror %></h4> 
+<% } %>
+<% if (messagesuccess) { %>
+  <h4 class="alert alert-success text-center text-success mt-2"><%= messagesuccess %></h4> 
+<% } %>
