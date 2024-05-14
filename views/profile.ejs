@@ -7,14 +7,23 @@
 
   <div class="container mt-4">
     <div class="row">
-      <div class="col-md-6 mb-sm-3">
+      <% if (messageerror) { %>
+        <h4 class="alert alert-danger text-center text-danger mt-2"><%= messageerror %></h4> 
+      <% } %>
+      <% if (messagesuccess) { %>
+        <h4 class="alert alert-success text-center text-success mt-2"><%= messagesuccess %></h4> 
+      <% } %>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-5 mb-sm-12">
         <div class="card">
           <div class="card-header text-center">DANE OSOBOWE</div>
           <div class="avatar-ctn">
             <% if (student) { %>
-              <% if (student.first_name.slice(-1) === 'a') { %>
+              <% if (student.gender == 'K') { %>
                 <img class="avatar" src="/images/woman.png" alt="User profile picture">
-              <% } else if (student.first_name.slice(-1) !== 'a'){ %>               
+              <% } else if (student.gender == 'M'){ %>               
                 <img class="avatar" src="/images/man.png" alt="User profile picture">
               <% } %>
             <% } %>
@@ -23,9 +32,36 @@
             <% if (student) { %>
               <h5 class="card-title"><%= student.first_name %> <%= student.last_name %> (<%= student.id %>)</h5>
             <% } %>
-            <p class="card-text">W tym miejscu będą dane teleadresowe studenta (adres, telefon, adres e-mail, inne).</p>
-            <!-- <a href="/auth/addtransaction" type="button" class="btn btn-primary">Dodaj transakcję</a> -->
-            <!-- <a href="/login"><button type="button" class="btn btn-primary">Logowanie</button></a> -->
+
+
+            <table class="table table-bordered table-sm align-middle rounded table-warning">  
+              <tbody>
+                <tr>     
+                  <th scope="row">Login</th>
+                  <td class="h6"><%= student.userNick %></td>               
+                </tr>
+                <tr>     
+                  <th scope="row">Adres e-mail</th>
+                  <td class="h6"><%= student.email %></td>               
+                </tr>               
+                <tr>     
+                  <th scope="row">Telefon</th>
+                  <td class="h6"><%= student.phone %></td>               
+                </tr>
+                <tr>     
+                  <th scope="row">Adres</th>
+                  <td class="h6"><%= student.address1 %></td>               
+                </tr>               
+                <tr>     
+                  <th scope="row">Kod, miejscowość</th>
+                  <td class="h6"><%= student.zipCode1 %> <%= student.town1 %></td>               
+                </tr>                         
+              </tbody>
+            </table>
+
+            <div class="col-12 d-flex justify-content-end align-middle">
+              <a href="#" type="button" class="btn btn-warning align-self-center " name="changepasswordbutton" id="changepasswordbutton" data-bs-toggle="modal" data-bs-target="#exampleModal">Zmień hasło</a>
+            </div>
           </div>
         </div>
 
@@ -35,17 +71,28 @@
 
 
 
-        <div class="card mt-3">
+        <div class="card mt-3 mb-3">
           <div class="card-header text-center">ZAPISY</div>
 
-          <div class="card-body">
+          <div class="card-body pt-0">
  
             <!-- <p class="card-text">W tym miejscu będą dane dotyczące zapisów na poszczególne lata akademickie/szkolne.</p> -->
  
+            <div class="row align-items-center mx-3 my-2">
+              <!-- <% if (trans[0].academicyear == "") { %>
+                <div class="col-7 text-center align-middle"><h4 class="mb-0">Transakcje wszystkie</h4></div>
+              <% } else { %>
+                <div class="col-7 text-center align-middle"><h4 class="mb-0">Transakcje <%= trans[0].academicyear %></h4></div>               
+              <% } %> -->
 
+              <% if(user.level > 2) { %>
+                <div class="col-12 d-flex justify-content-end align-middle">
+                  <a href="/auth/addadmission/id/<%= student.id %>/sfn/<%= student.first_name %>/sln/<%= student.last_name %>" type="button" class="btn btn-success align-self-center ">+ Dodaj zapis</a>
+                </div>
+              <% } %>
+            </div>
 
-
-
+      
 
                  
             <table class="table table-bordered table-sm align-middle rounded">
@@ -62,6 +109,7 @@
                 </tr>
               </thead>
               <tbody>
+             
                 <% if (admissions.length > 0) { %>
                   <% admissions.forEach((admission) => { %>  
               <tr>     
@@ -72,11 +120,11 @@
 
                   <% if(user.level > 3) { %>
                     <td class="text-center">
-                      <a href="/auth/viewtransaction/id/<%= admission.admissionId %>/sfn/<%= student.first_name %>/sln/<%= student.last_name %>/ids/<%= student.studentId %>" type="button" class="btn btn-light btn-small" data-button="view" data-title="Zobacz zapis" style="width: 40"><i class="bi bi-eye"></i></a>
+                      <!-- <a href="/auth/viewtransaction/id/<%= admission.admissionId %>/sfn/<%= student.first_name %>/sln/<%= student.last_name %>/ids/<%= student.studentId %>" type="button" class="btn btn-light btn-small" data-button="view" data-title="Zobacz zapis" style="width: 40"><i class="bi bi-eye"></i></a> -->
 
-                      <a href="/auth/edittransaction/id/<%= admission.admissionId %>/sfn/<%= student.first_name %>/sln/<%= student.last_name %>/ids/<%= student.studentId %>" type="button" class="btn btn-light btn-small" data-button="edit" data-title="Edytuj zapis" style="width: 40"><i class="bi bi-pencil"></i></a>
+                      <a href="/auth/editadmission/id/<%= admission.admissionId %>" type="button" class="btn btn-light btn-small" data-button="edit" data-title="Edytuj zapis" style="width: 40"><i class="bi bi-pencil"></i></a>
 
-                      <a href="/auth/id/<%= admission.admissionId %>/sid/<%= student.id %>/sfn/<%= student.first_name %>/sln/<%= student.last_name %>" type="button" class="btn btn-light btn-small" data-button="delete" data-title="Usuń zapis" style="width: 40" onclick="return checkdelete()"><i class="bi bi-person-x"></i></a>
+                      <a href="/auth/admissionId/<%= admission.admissionId %>/id/<%= student.id %>" type="button" class="btn btn-light btn-small" data-button="delete" data-title="Usuń zapis" style="width: 40" onclick="return checkDeleteAdmission()"><i class="bi bi-person-x"></i></a>
 
                   </td>
                   <% } else { %>
@@ -96,6 +144,16 @@
                 </tr> 
               </tfoot>  
             </table>
+
+            <div class="row">
+              <% if (messageerror) { %>
+                <h4 class="alert alert-danger text-center text-danger mt-2 al"><%= messageerror %></h4> 
+              <% } %>
+              <% if (messagesuccess) { %>
+                <h4 class="alert alert-success text-center text-success mt-2 al"><%= messagesuccess %></h4> 
+              <% } %>
+            </div>
+
           </div>
         </div>
       </div>
@@ -104,26 +162,37 @@
                   <!-- INFORMACJE FINANSOWE -->
 
 
-
-      <div class="col-12 col-md-6">
+      <div class="col-lg-7 mb-sm-12">
         <div class="card text-center">
           <div class="card-header">INFORMACJE FINANSOWE</div>
           <div class="card-body">
-            <% if (student) { %>
+            <!-- <% if (student) { %>
               <h5 class="card-title">Witaj <%= student.first_name %>!</h5>          
+            <% } %> -->
+            <% if (student.gender == "K") { %>
+              <p class="card-text text-primary">Poniżej znajdują się zapisane na Twoim koncie transakcje! <br> Gdybyś miała jakieś uwagi pisz na adres: ksiegowosc@wsth.pl!</span></p> 
+             <% } else if (student.gender == "M") { %>
+              <p class="card-text text-primary">Poniżej znajdują się zapisane na Twoim koncie transakcje! <br> Gdybyś miał jakieś uwagi pisz na adres: ksiegowosc@wsth.pl!</span></p>
             <% } %>
-            <p class="card-text text-primary">Poniżej znajdują się zapisane na Twoim koncie transakcje! <br> Gdybyś miał/miała jakieś uwagi pisz na adres: ksiegowosc@wsth.pl!</span></p> 
 
             <% if (admissions.length > 0) { %>
               <form class="d-flex mb-0 mt-3" role="search" method="GET" action="/profile/id/<%= student.id %>" novalidate>
               <div class="row mx-auto bg-light p-3 border border-info rounded align-middle w-75 justify-content-center mb-2">
-                <div class="col-6">
-                  <!-- <label class="fs-6" for="ayear">&nbsp;&nbsp;Rok akademicki</label> -->
+                <div class="col-8">
+ 
                   <select class="custom-select-addtransaction fs-6 w-100 text-center" name="ayear" id="ayear" style="padding: 6px 12px" aria-placeholder="Rok akademicki">
                     <option value="0" selected>Wszystko</option>
-                    <% admissions.forEach((admission) => { %>  
-                    <option value="<%= admission.admissionId %>"><%= admission.ayear %></option>         
+
+                    <% admissions.forEach((admission) => { %>
+                      
+                      <% if (admission.admissionId == trans[0].ayear) { %>
+                        <option value="<%= admission.admissionId %>" selected><%= admission.ayear %> - <%= admission.institute %></option>
+                        <% } else { %>
+                          <option value="<%= admission.admissionId %>"><%= admission.ayear %> - <%= admission.institute %></option>
+                      <% } %>
+
                     <% }) %>
+                    
                   </select>
                 </div>
                 <div class="col-4 d-flex justify-content-center">
@@ -145,10 +214,19 @@
 
               <% if(user.level > 3) { %>
                 <div class="col-5 d-flex justify-content-end align-middle">
-                  <a href="/auth/addtransaction/id/<%= student.id %>/last_name/<%= student.last_name %>/first_name/<%= student.first_name %>/lev/<%= user.level %>" type="button" class="btn btn-primary align-self-center ">+ Dodaj transakcję</a>
+                  <a href="/auth/addtransaction/id/<%= student.id %>/p/1" type="button" class="btn btn-primary align-self-center ">+ Dodaj transakcję</a>
                 </div>
               <% } %>
             </div>
+
+
+            <!-- <% if (messageerror) { %>
+              <h4 class="alert alert-danger text-center text-danger mt-2"><%= messageerror %></h4> 
+            <% } %>
+            <% if (messagesuccess) { %>
+              <h4 class="alert alert-success text-center text-success mt-2"><%= messagesuccess %></h4> 
+            <% } %> -->
+
   
             <table class="table table-bordered table-sm align-middle rounded">
               <thead class="thead-dark align-middle">
@@ -161,9 +239,7 @@
                 </tr>
               </thead>
               <tbody>
-                <% console.log("Trans.length: ", trans.length) %>
-                <% console.log(trans[0].totalCharges) %>
-                <% console.log(trans[0].totalIncome) %>
+              
                 <% if (!(trans.length < 2 && trans[0].totalCharges == '0,00' && trans[0].totalIncome == '0,00') ) { %>
                   <% trans.forEach(tran => { %>  
               <tr>     
@@ -185,7 +261,7 @@
                     <a href="/auth/viewtransaction/id/<%= tran.id %>" type="button" class="btn btn-light btn-small" data-button="view" data-title="Zobacz transakcję" style="width: 40"><i class="bi bi-eye"></i></a>
                     <% if(user.level > 3) { %>
                     <a href="/auth/edittransaction/id/<%= tran.id %>" type="button" class="btn btn-light btn-small" data-button="edit" data-title="Edytuj transakcję" style="width: 40"><i class="bi bi-pencil"></i></a>
-                    <a href="/auth/id/<%= tran.id %>" type="button" class="btn btn-light btn-small" data-button="delete" data-title="Usuń transakcję" style="width: 40" onclick="return checkdelete()"><i class="bi bi-person-x"></i></a>
+                    <a href="/auth/transId/<%= tran.id %>/id/<%= student.id%>" type="button" class="btn btn-light btn-small" data-button="delete" data-title="Usuń transakcję" style="width: 40" onclick="return checkDeleteTransaction()"><i class="bi bi-person-x"></i></a>
                     <% } %>
                   </td>
                 </tr>
@@ -235,12 +311,98 @@
     </div>
   </div>
 
+
+
+
+
+<!-- =============================MODAL================================= -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+    <form action="/auth/password/id/<%= student.id %>" method="POST">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Zmiana hasła</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal"></button> -->
+      </div>
+      <div class="modal-body">
+        <form action="">
+        <div class="row justify-content-center">
+          <div class="mb-3 d-flex">
+            <div class="col col-12">
+              <label for="modalpreviouspassword">&nbsp;&nbsp;Poprzednie hasło</label>
+              <input type="password" class="form-control fs-6" id="modalpreviouspassword" name="modalpreviouspassword">
+            </div>
+          </div>
+        </div>
+        
+        <div class="row justify-content-center">
+          <div class="mb-3 d-flex">
+            <div class="col col-12">
+              <label for="modalnewpassword">&nbsp;&nbsp;Nowe hasło</label>
+              <input type="password" class="form-control fs-6" id="modalnewpassword" name="modalnewpassword">
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-center">
+          <div class="mb-3 d-flex">
+            <div class="col col-12">
+              <label for="modalnewpasswordconfirmation">&nbsp;&nbsp;Powtórzenie nowego hasła</label>
+              <input type="password" class="form-control fs-6" id="modalnewpasswordconfirmation" name="modalnewpasswordconfirmation">
+            </div>
+          </div>
+        </div>
+      
+      </div>
+
+      <div class="modal-footer">
+ 
+        <div class="row w-100 d-flex justify-content-evenly">
+          <div class="col col-6 p-0 text-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+          </div>
+
+          <div class="col col-6 p-0 text-center">
+            <a href="#"><button type="submit" class="btn btn-primary" id="savepasswordchangebutton">Zmień hasło</button></a>
+            <!-- <button type="button" class="btn btn-primary" id="savepasswordchangebutton" data-bs-dismiss="modal">Zmień hasło</button> -->
+          </div>
+        </div>
+      </div>  
+    </form>  
+    </div>
+  </div>
+</div>
+
+<!-- =================================================================== -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 
   <script>
-    function checkdelete() {
+    function checkDeleteTransaction() {
       return confirm('Czy na pewno usunąć tę transakcję?')
     }
+
+    function checkDeleteAdmission() {
+      return confirm('Czy na pewno usunąć ten zapis?')
+    }
+
+    let alert = document.querySelector('.alert')
+    if(alert) {
+      setTimeout(() => {
+        alert.hidden = true
+      }, 5000)
+    }
+    let al = document.querySelector('.al')
+    if(al) {
+      setTimeout(() => {
+        al.hidden = true
+      }, 5000)
+    }
+    //==================CHANGE PASSWORD======================
+    const changePasswordButton = document.querySelector('#changepasswordbutton')
+    const savePasswordChangeButton = document.querySelector('#savepasswordchangebutton')
+    //=======================================================
+  
+   
   </script>
 </body>
 </html>

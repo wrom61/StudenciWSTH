@@ -161,3 +161,23 @@ label {
   /* width: 300px; */
   height: 150px;
 }
+
+.help-button-AUX {
+  background-color: #489207;
+  color: white;
+}
+
+.help-button-WSTH {
+  background-color: #224c7c;
+  color: white;
+}
+
+.help-button-SJO {
+  background-color: #b4873e;
+  color: white;
+}
+
+.help-button-gear {
+  background-color: #656763;
+  color: white;
+}

@@ -85,25 +85,69 @@
   </div>
 </div>
 
-<% if(user.level > 3) { %>
+<div class="d-flex">
+  <div class="col-6">
+    <label for="level">&nbsp;&nbsp;Płeć</label>
+    <select class="custom-select-addtransaction fs-6 w-100 text-center" name="gender" id="gender" style="padding: 6px 12px">
+      <option value="0"></option>
+          <% if (student.gender === 'K') { %>
+            <option value="K" class="text-center" selected>Kobieta</option>
+           <% } else { %>
+            <option value="K" class="text-center">Kobieta</option>
+          <% } %>
+          <% if (student.gender === 'M') { %>
+            <option value="M" class="text-center" selected>Mężczyzna</option>
+           <% } else { %>
+            <option value="M" class="text-center">Mężczyzna</option>
+          <% } %>
+    </select>
+  </div>
+</div>
 
+<% if(user.level > 3) { %>
+<!-- potem zmienić na (user.level > 3) -->
 <hr class="text-danger">
 
 <div class="d-flex mb-3">
   <div class="col-6">
     <label for="level">&nbsp;&nbsp;Poziom dostępu</label>
     <select class="custom-select-addtransaction fs-6 w-100 text-center" name="level" id="level" style="padding: 6px 12px">
-      <option value="1">Student</option>
-      <option value="2">Przeglądający</option>
-      <option value="3">Studenci/Należności</option>
-      <option value="4">Administrator</option>    
+     
+      <% if (student.level === 1) { %>
+        <option value="1" selected>Student</option>
+        <% } else { %>
+          <option value="1">Student</option>
+      <% } %>
+      <% if (student.level === 2) { %>
+        <option value="2" selected>Przeglądający</option>
+        <% } else { %>
+        <option value="2">Przeglądający</option>
+      <% } %>
+      <% if (student.level === 3) { %>
+        <option value="3" selected>Wpis należności</option>
+        <% } else { %>
+          <option value="3">Wpis należności</option>
+      <% } %>
+      <% if (student.level === 4) { %>
+        <option value="4" selected>Administrator</option>
+        <% } else { %>
+          <option value="4">Administrator</option>
+      <% } %>
     </select>
   </div>
   <div class="col-6">
     <label for="level">&nbsp;&nbsp;Instytut</label>
     <select class="custom-select-addtransaction fs-6 w-100 text-center" name="institute" id="institute" style="padding: 6px 12px">
       <option value="0">Wszystkie</option>
-      <option value="1">IPZ</option>      
+      <% if (institutes) { %>
+        <% institutes.forEach(institute => { %>
+          <% if (student.instituteId_access === institute.instituteId) { %>
+            <option value="<%= institute.instituteId %>" class="text-center" selected><%= institute.instituteShort %></option>
+           <% } else { %>
+            <option value="<%= institute.instituteId %>" class="text-center"><%= institute.instituteShort %></option>
+          <% } %>
+        <% }) %>
+      <% } %> 
     </select>
   </div>
 </div>
@@ -113,8 +157,15 @@
     <label for="level">&nbsp;&nbsp;Punkt konsultacyjny</label>
     <select class="custom-select-addtransaction fs-6 w-100 text-center" name="branch" id="branch" style="padding: 6px 12px">
       <option value="0">Wszystkie</option>
-      <option value="1">Podkowa Leśna</option>
-      <option value="2">Nysa</option>
+      <% if (branches) { %>
+        <% branches.forEach(branch => { %>
+          <% if (student.branchId_access === branch.branchId) { %>
+            <option value="<%= branch.branchId %>" class="text-center" selected><%= branch.branchName %></option>           
+            <% } else { %>
+              <option value="<%= branch.branchId %>" class="text-center"><%= branch.branchName %></option>
+          <% } %>
+        <% }) %>
+        <% } %> 
     </select>
   </div>
 </div>

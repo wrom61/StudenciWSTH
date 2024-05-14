@@ -24,7 +24,7 @@
   <nav>
     <h4>Studenci WSTH</h4>
     <% if ( user ) { %>
-    <h4 class="text-warning"><%= user.first_name %> <%= user.last_name %></h4>
+    <h4 class="text-warning"><%= user.first_name %> <%= user.last_name %> (<%= user.level %>)</h4>
     <% } %>
     <ul>
       <% if ( !user ) { %>

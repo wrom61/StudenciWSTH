@@ -46,3 +46,58 @@ function resizeStyles() {
 }
 window.addEventListener("resize", resizeStyles)
 
+const ln = document.querySelector('#searchField_ln');
+const fn = document.querySelector('#searchField_fn');
+const ad = document.querySelector('#searchField_ad');
+const alertSuccess = document.querySelector('.alert-success')
+
+
+document.addEventListener('keydown', function(event) {
+ if(event.keyCode == 27) {
+   ln.value = '';
+   fn.value = '';
+   ad.value = '';
+   alertSuccess.remove();
+   ln.focus();
+  }
+});
+
+function checkdelete() {
+return confirm('Czy na pewno usunąć tego studenta?')
+}
+
+ln.addEventListener("keypress", function(event) {
+if (event.key === "Enter") {
+  event.preventDefault()
+  document.getElementById("searchFieldButton").click();
+}
+})
+ln.addEventListener("focus", () =>  ln.select())
+
+fn.addEventListener("keypress", function(event) {
+if (event.key === "Enter") {
+  event.preventDefault()
+  document.getElementById("searchFieldButton").click();
+}
+})
+fn.addEventListener("focus", () =>  fn.select())
+
+ad.addEventListener("keypress", function(event) {
+if (event.key === "Enter") {
+  event.preventDefault()
+  document.getElementById("searchFieldButton").click();
+}
+})
+ad.addEventListener("focus", () =>  ad.select())  
+
+let alert = document.querySelector('.alert');
+
+[...document.querySelectorAll('.form-control')].forEach(function(item) {
+item.addEventListener('input', textChange)
+})
+
+function textChange() {
+const val = alert ? alert.hidden = true : '';
+}
+
+

@@ -7,9 +7,38 @@ const db = mysql.createConnection({
 })
 
 // ===================NUMBER NA STRING==============================
-exports.numberToString = (num) => {
+// exports.getStudentsAcademicYears = (a) => {
+//   // console.log('querrrrry', a);
   
+//   let ay = ''
+
+// console.log(`SELECT academicyear FROM admissions INNER JOIN academicyears on admissions.academicyearId = academicyears.id WHERE admissions.admissionId = ${a}`);
+
+
+//   if(a > 0 && typeof(a) != undefined) {       
+//     db.query("SELECT academicyear FROM admissions INNER JOIN academicyears on admissions.academicyearId = academicyears.id WHERE admissions.admissionId = ?", [a], (err, academicyear) => {
+//       // console.log(academicyear[0].academicyear); 
+//       ay = academicyear[0].academicyear
+//       console.log('ay', academicyear[0].academicyear);
+//     })
+//   }
+//   console.log('ay', ay);
+//   return ay
+// }
+
+//====================SZYFROWANIE==========================================
+exports.encryption = (length) => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
 }
+
 
 // ===================DANE DO INPUTÓW IN ADMISSION=========================
 exports.admissionFields = (req, res, next) => {

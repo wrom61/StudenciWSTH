@@ -1,0 +1,231 @@
+<div class="buttons mb-2 d-flex">
+  <a href="#" id="button1" type="button" class="btn btn-light btn-small help-button-AUX" style="width: 40"><i class="bi bi-1-circle"></i></a>
+       
+  <a href="#" id="buttongear" type="button" class="btn btn-light btn-small help-button-gear" data-bs-toggle="modal" data-bs-target="#exampleModal"  style="width: 40; margin-left: auto;"><i class="bi bi-gear"></i></a>
+</div>
+
+<div class="row mb-3">
+  <div class="col text-center">
+    <h3 class="text-primary fw-bold"><%= studentfirstname %> <%= studentlastname %></h3>
+  </div>
+</div>
+<hr class="text-danger">
+
+<div class="col d-flex flex-column text-center">
+
+  <div class="justify-content-center">
+    <label for="ra" class="fs-4 mr-3 w-100">Rok akademicki</label>
+    <select class="custom-select-addtransaction mb-3 fs-5 w-75" name="ayears" id="ra">
+    <option></option>
+    <% if (ayears) { %>
+      <% ayears.forEach(year => { %>
+        <% if (admissiondetails.academicyearId == year.id) { %>
+          <option value="<%= year.id %>" class="text-center" selected><%= year.academicyear %></option>
+        <% } else { %>
+          <option value="<%= year.id %>" class="text-center"><%= year.academicyear %></option>        
+        <% } %>
+      <% }) %>           
+    <% } %>
+    </select>
+  </div>
+
+
+  <div class="justify-content-center">
+    <label for="institute" class="fs-4 mr-3 w-100">Instytut</label>
+    <select class="custom-select-addtransaction mb-3 fs-5 w-75" name="institutes" id="institute">
+    <option></option>
+    <% if (institutes) { %>
+      <% institutes.forEach(institute => { %>        
+        <% if (admissiondetails.instytutId == institute.instituteId) { %>
+          <option value="<%= institute.instituteId %>" class="text-center" selected><%= institute.instituteName %></option>
+        <% } else { %>
+          <option value="<%= institute.instituteId %>" class="text-center"><%= institute.instituteName %></option>        
+        <% } %>
+      <% }) %>
+    <% } %>    
+    </select>
+  </div>
+
+  <div class="justify-content-center">
+    <label for="branches" class="fs-4 mr-3 w-100">Punkt konsultacyjny</label>
+    <select class="custom-select-addtransaction mb-3 fs-5 w-75" name="branches" id="branches">
+    <option></option>
+    <% if (branches) { %>
+      <% branches.forEach(branch => { %>
+
+        <% if (admissiondetails.branchId == branch.branchId) { %>
+          <option value="<%= branch.branchId %>" class="text-center" selected><%= branch.branchName %></option>
+        <% } else { %>
+          <option value="<%= branch.branchId %>" class="text-center"><%= branch.branchName %></option>        
+        <% } %>
+      <% }) %>
+    <% } %> 
+    </select>
+  </div>
+
+  <div class="justify-content-center">
+    <label for="levels" class="fs-4 mr-3 w-100">Poziom kształcenia</label>
+    <select class="custom-select-addtransaction mb-3 fs-5 w-75" name="levels" id="levels">
+    <option></option>
+    <% if (levels) { %>
+      <% levels.forEach(level => { %>
+
+        <% if (admissiondetails.levelId == level.levelId) { %>
+          <option value="<%= level.levelId %>" class="text-center" selected><%= level.levelName %></option>
+        <% } else { %>
+          <option value="<%= level.levelId %>" class="text-center"><%= level.levelName %></option>        
+        <% } %>
+      <% }) %>
+    <% } %>
+    </select>
+  </div>          
+
+  <div class="justify-content-center">
+    <label for="markers" class="fs-4 mr-3 w-100">Znacznik</label>
+    <select class="custom-select-addtransaction mb-5 fs-5 w-75" name="markers" id="markers">
+    <option></option>
+    <% if (markers) { %>
+      <% markers.forEach(marker => { %>
+        <% if (admissiondetails.markerId == marker.markerId) { %>
+          <option value="<%= marker.markerId %>" class="text-center" selected><%= marker.markerName %></option>
+        <% } else { %>
+          <option value="<%= marker.markerId %>" class="text-center"><%= marker.markerName %></option>        
+        <% } %>
+      <% }) %>
+    <% } %>
+    </select>
+  </div>
+  <div class="d-flex justify-content-center">
+    <div class="form-floating mb-5">
+      <% if (admissiondetails.Indexnumber) { %>
+        <input type="text" class="form-control w-75 fs-4" id="index" name="index" placeholder="Numer indeksu" value="<%= admissiondetails.Indexnumber %>">
+      <% } else { %>
+        <input type="text" class="form-control w-75 fs-4" id="index" name="index" placeholder="Numer indeksu">
+      <% } %>
+      <label for="index">Numer indeksu</label>
+    </div>
+
+    <% if (admissiondetails.resignation === 1) { %>
+      <input class="fs-4 mb-5" type="checkbox" id="resignation" name="resignation" value="1" style="width: 20px;" checked>
+      <% } else { %>
+       <input class="fs-4 mb-5" type="checkbox" id="resignation" name="resignation" value="0" style="width: 20px;">
+       <% } %>
+    <label for="resignation" class="fs-4 mb-5 mx-3" style="margin-top: 11px;">Rezygnacja?</label>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col col-6">
+    <a href="#"><button class="w-100 btn btn-lg btn-primary" type="submit"><%= buttonTitle %></button></a> 
+  </div>
+  <div class="col col-6">
+    <a href="/profile/id/<%= studentId %>"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
+  </div>
+</div>
+
+<% if (messageerror) { %>
+  <h4 class="alert alert-danger text-center text-danger mt-2"><%= messageerror %></h4> 
+<% } %>
+<% if (messagesuccess) { %>
+  <h4 class="alert alert-success text-center text-success mt-2"><%= messagesuccess %></h4> 
+<% } %>
+
+
+<!-- =============================MODAL================================= -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Dane domyślne</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+
+        
+        <div class="justify-content-center">
+          <label for="may1">&nbsp;&nbsp;Rok akademicki</label>
+          <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="may1" id="may1" style="padding: 6px 12px">
+            <option></option>
+            <% if (ayears) { %>
+              <% ayears.forEach(year => { %>
+                <option value="<%= year.id %>" class="text-center"><%= year.academicyear %></option>           
+              <% }) %>           
+            <% } %>
+          </select>
+        </div>
+        
+
+        <div>
+          <div class="justify-content-center">
+            <label for="mi1">&nbsp;&nbsp;Instytut</label>
+            <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="mi1" id="mi1" style="padding: 6px 12px">
+              <option></option>
+              <% if (institutes) { %>
+                <% institutes.forEach(institute => { %>
+                  <option value="<%= institute.instituteId %>" class="text-center"><%= institute.instituteName %></option>
+                <% }) %>
+              <% } %>    
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="justify-content-center">
+            <label for="mb1">&nbsp;&nbsp;Punkt konsultacyjny</label>
+            <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="mb1" id="mb1" style="padding: 6px 12px">
+              <option></option>
+              <% if (branches) { %>
+              <% branches.forEach(branch => { %>
+                <option value="<%= branch.branchId %>" class="text-center"><%= branch.branchName %></option>
+              <% }) %>
+              <% } %> 
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="justify-content-center">
+            <label for="ml1">&nbsp;&nbsp;Poziom kształcenia</label>
+            <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="ml1" id="ml1" style="padding: 6px 12px">
+              <option></option>
+              <% if (levels) { %>
+                <% levels.forEach(level => { %>
+                <option value="<%= level.levelId %>" class="text-center"><%= level.levelName %></option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="justify-content-center">
+            <label for="mm1">&nbsp;&nbsp;Znacznik</label>
+            <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="mm1" id="mm1" style="padding: 6px 12px">
+              <option></option>
+              <% if (markers) { %>
+                <% markers.forEach(marker => { %>
+                <option value="<%= marker.markerId %>" class="text-center"><%= marker.markerName %></option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+ 
+        <div class="row w-100 d-flex justify-content-evenly">
+          <div class="col col-6 p-0 text-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+          </div>
+          <div class="col col-6 p-0 text-center">
+            <button type="button" class="btn btn-primary" id="modalsaveadmission" data-bs-dismiss="modal">Zapisz</button>
+          </div>
+        </div>
+      </div>    
+    </div>
+  </div>
+</div>
+
+<!-- =================================================================== -->
+

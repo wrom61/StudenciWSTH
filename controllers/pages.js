@@ -11,15 +11,20 @@ const db = mysql.createConnection({
 // SHOW PROFILE PAGE
 // SEARCH/FIND STUDENT
 // SHOW REGISTER PAGE
+// SHOW STUDENT LIST
+// DELETE STUDENT
 
 //===============SHOW PROFILE PAGE==================================
 exports.showProfilePage = async (req, res) => {
-  // console.log(req.user.id);
+  // console.log("Req.body in showProfilePage: ", req.query);
+//  console.log("Req.body in showProfilePage: ", req.zapisy);
   // console.log("Req.params in Show profile pageE: ", req.params);
   // console.log("Req.user in Show profile pageE: ", req.user);
   // console.log("Req.student in Show profile pageE: ", req.student);
   // console.log('Tut: ', req.trans);
   // console.log("Student", req.student);
+  // console.log('messages', req.messages);
+  
   
   if( req.user ) {
     res.render('profile', {
@@ -34,8 +39,12 @@ exports.showProfilePage = async (req, res) => {
       //   lev: req.params.lev,
       //   studentId: req.params.studentId
       // },
-      admissions: req.zapisy
-    })     
+      admissions: req.zapisy,
+      messagesuccess: req.messages.messagesuccess,
+      messageerror: req.messages.messageerror
+    }) 
+    // console.log("Trans", req.trans);
+        
   } else {
     res.redirect('/login')
   }  
@@ -80,7 +89,10 @@ exports.showRegisterPage = async (req, res) => {
           formTitle: "Rejestracja studenta",
           buttonTitle: "Zarejestruj",
           regist: 1,
-          student: []
+          student: [],
+          institutes: req.fields.institutes,
+          branches: req.fields.branches,
+          levels: req.fields.levels,
         })
       } else {
         res.redirect('/login')
@@ -89,36 +101,56 @@ exports.showRegisterPage = async (req, res) => {
 }
 }
 
-// //===============SHOW LOGIN PAGE==================================
-// exports.showLoginPage = async (req, res) => {
-//   console.log('Czy jestem w LOGIN?');
-// console.log('req.user w LOGIN', req.user);
-//   try {
-//     // if(req.user.level > 0) {
-//       res.status(200).render('login', {
-//         pageTitle: 'Logowanie', 
-//         message: '', 
-//         user: req.user
-//       })
-//     // }    
-//   } catch (error) {
-//       res.status(200).render('login', {
-//       pageTitle: 'Logowanie', 
-//       message: '', 
-//       user: req.user
-//     })
-//   }
-// }
-
-
-
-//============================================================
-//============================================================
-//============================================================
-//============================================================
-//============================================================
-
-
+//==================SHOW STUDENT LIST=========================
+exports.showStudentList = async (req, res) => {
+  let sqlLevelParam = 2  
+  if(req.user.level > 3) {
+    sqlLevelParam = 6
+  }
+  
+  db.query('SELECT * FROM users WHERE level < ? AND status = ? ORDER BY last_name, first_name LIMIT 200', [sqlLevelParam, 1], async (err, result) => {
+    // console.log('Czy w studentList?');
+    
+    if(!err) {
+      // req.allStudents = result
+      if(req.user) {
+        try {      
+          if (req.user.level > 1) {
+          //  console.log(req.ala1.ala);
+          //  console.log(req.ala1.jan);
+           
+              // console.log(req.allStudents);
+                        
+              res.status(200).render('studentsList', {
+              pageTitle: 'Lista studentów',
+              successmessage: req.messagesuccess,
+              user: req.user,
+              students: result,
+              searchFieldValues: {
+                searchfn: '',
+                searchln: '',
+                searchad: ''
+              },
+              message: ''
+            })
+          } else {
+            res.status(200).render('index', {
+              pageTitle: 'Strona główna',
+              user: req.user})
+          }    
+        } catch (error) {
+        }
+      } else {
+        res.status(200).render('index', {
+        pageTitle: 'Strona główna',
+        user: req.user})
+      }
+      // next()
+    } else {
+      console.log("Problem to get all students: ", err);
+    }
+  })  
+}
 
 //=====================DELETE STUDENT=========================
 exports.deleteUser = (req, res, next) => {
@@ -149,7 +181,6 @@ exports.deleteUser = (req, res, next) => {
           if(error) {
             console.log(error);
           } else {
-          // next()       
             res.status(200).redirect('/')
           }
         })
@@ -158,56 +189,22 @@ exports.deleteUser = (req, res, next) => {
   })
 }
 
+//============================================================
+//============================================================
+//============================================================
+//============================================================
+//============================================================
 
 
 
 
 
 
-//==================STUDENT LIST=========================
-exports.showStudentList = async (req, res) => {
-  db.query('SELECT * FROM users WHERE level = ? AND status = ? ORDER BY last_name, first_name LIMIT 200', [1, 1], async (err, result) => {
-    // console.log('Czy w studentList?');
-    
-    if(!err) {
-      // req.allStudents = result
-      if(req.user) {
-        try {      
-          if (req.user.level > 1) {
-          //  console.log(req.ala1.ala);
-          //  console.log(req.ala1.jan);
-           
-              // console.log(req.allStudents);
-                        
-              res.status(200).render('studentsList', {
-              pageTitle: 'Lista studentów',
-              successmessage: req.messagesuccess,
-              user: req.user,
-              students: result,
-              searchFieldValues: {
-                searchfn: '',
-                searchln: '',
-                searchad: ''
-              }
-            })
-          } else {
-            res.status(200).render('index', {
-              pageTitle: 'Strona główna',
-              user: req.user})
-          }    
-        } catch (error) {
-        }
-      } else {
-        res.status(200).render('index', {
-        pageTitle: 'Strona główna',
-        user: req.user})
-      }
-      // next()
-    } else {
-      console.log("Problem to get all students: ", err);
-    }
-  })  
-}
+
+
+
+
+
 
 
 //=================TRANSACTIONS================================
@@ -249,7 +246,26 @@ exports.showStudentList = async (req, res) => {
 //   };
 
 
-  
+  // //===============SHOW LOGIN PAGE==================================
+// exports.showLoginPage = async (req, res) => {
+//   console.log('Czy jestem w LOGIN?');
+// console.log('req.user w LOGIN', req.user);
+//   try {
+//     // if(req.user.level > 0) {
+//       res.status(200).render('login', {
+//         pageTitle: 'Logowanie', 
+//         message: '', 
+//         user: req.user
+//       })
+//     // }    
+//   } catch (error) {
+//       res.status(200).render('login', {
+//       pageTitle: 'Logowanie', 
+//       message: '', 
+//       user: req.user
+//     })
+//   }
+// }
 
   
 

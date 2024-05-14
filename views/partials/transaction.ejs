@@ -1,17 +1,92 @@
+<div class="buttons mb-2 d-flex">
+  <a href="#" id="button1" type="button" class="btn btn-light btn-small help-button-AUX" style="width: 40"></a>
+  <a href="#" id="button2" type="button" class="btn btn-light btn-small help-button-AUX" style="width: 40"></a>
+  <a href="#" id="button3" type="button" class="btn btn-light btn-small help-button-AUX" style="width: 40"></a>
+  <a href="#" id="button4" type="button" class="btn btn-light btn-small help-button-WSTH" style="width: 40">WSTH1</a>
+  <a href="#" id="button5" type="button" class="btn btn-light btn-small help-button-WSTH" style="width: 40">WSTH2</a>
+  <a href="#" id="button6" type="button" class="btn btn-light btn-small help-button-SJO" style="width: 40">SJO</a>
+
+  <a href="#" id="buttongear" type="button" class="btn btn-light btn-small help-button-gear" data-bs-toggle="modal" data-bs-target="#exampleModal"  style="width: 40; margin-left: auto;"><i class="bi bi-gear"></i></a>
+</div>
 
 <h2 class="form-title"><%= formTitle %></h2>
 <h4 class="mb-4"><% if (student.last_name) { %><%= student.last_name %> <%= student.first_name %> (<%= student.id %>)<% } %> <% if (enteredValues.transactionId) { %>(<%= enteredValues.transactionId %>)<% } %> </h4>
 
 
+<div class="row mx-auto bg-light pb-2 pt-2 border border-info rounded align-middle w-75 justify-content-center mb-2">
 
-<div class="row mx-auto bg-light p-3 pt-2 border border-info rounded align-middle w-75 justify-content-center mb-2">
-  <div class="col-6">
+  <div class="row align-items-center py-0">
+
+
+    <table class="table table-sm text-white mt-3">
+
+      <thead>
+        <tr class="text-primary" style="background-color:khaki; border-bottom: 2px solid red;">      
+          <th scope="col" class="text-center fw-bold">Rok akademicki</th>
+          <th scope="col" class="text-end fw-bold">Saldo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% admissions.forEach((admission) => { %>
+          <% if (admission.yearbalance > 0) { %>
+            <tr class="text-success">
+              <td class="text-center"><%= admission.ayear %> zł</td>
+              <td class="text-end"><%= admission.yearbalance %> zł</td>
+            </tr>
+            <% } else if (admission.yearbalance < 0) { %>
+              <tr class="text-danger">
+                <td class="text-center"><%= admission.ayear %> zł</td>
+                <td class="text-end"><%= admission.yearbalance %> zł</td>
+              </tr> 
+            <% } else { %>
+              <tr class="text-primary">
+                <td class="text-center"><%= admission.ayear %> zł</td>
+                <td class="text-end"><%= admission.yearbalance %> zł</td>
+              </tr>     
+          <% } %>
+        <% }) %>
+
+        
+        <!-- <tr class="align-middle text-black">
+          <td class="text-center">Razem</td>
+          <td class="text-end"><%= totalBalance %> zł</td>
+        </tr> -->
+      </tbody>
+      
+      <tfoot style="background-color: burlywood">
+      <% if (totalBalance > 0) { %>
+        <tr class="align-middle text-success fw-bold">
+          <td class="text-center">Razem</td>
+          <td class="text-end"><%= totalBalance %> zł</td>
+        </tr>
+        <% } else if (totalBalance < 0) { %>
+          <tr class="align-middle text-danger fw-bold">
+            <td class="text-center">Razem</td>
+            <td class="text-end"><%= totalBalance %> zł</td>
+          </tr>
+        <% } else { %>
+          <tr class="align-middle text-primary fw-bold">
+            <td class="text-center">Razem</td>
+            <td class="text-end"><%= totalBalance %> zł</td>
+          </tr>   
+      <% } %>
+    </tfoot>
+    </table>
+  </div>
+
+  <!-- <div class="col-6">
 
     <label for="balanceyear">&nbsp;&nbsp;Rok akademicki</label>
     <select class="custom-select-addtransaction fs-6 w-100 text-center" name="balanceyear" id="balanceyear" style="padding: 6px 12px" aria-placeholder="Rok akademicki" onchange="giveSelection(sel1.value)">
       <option value="0">Wszystkie</option>
-      <% admissions.forEach((admission) => { %>  
-        <option value="<%= admission.admissionId %>" selected><%= admission.ayear %></option>         
+      <% admissions.forEach((admission) => { %> 
+
+        <% if (admission.yearbalance < 0) { %>
+          <option value="<%= admission.admissionId %>" selected><%= admission.ayear %> zł</option>
+          <% } else { %>
+            <option value="<%= admission.admissionId %>"><%= admission.ayear %> zł</option>
+        <% } %>
+
       <% }) %>
     </select>
   </div>
@@ -21,16 +96,13 @@
     <select class="custom-select-addtransaction fs-6 w-100 text-center" name="yearbalance" id="yearbalance" style="padding: 6px 12px" aria-placeholder="Saldo roku">
       <option value="0"><%= totalBalance %> zł</option>
       <% admissions.forEach((admission) => { %>  
-        <option value="<%= admission.admissionId %>" selected><%= admission.yearbalance %> zł</option>         
+        <% if (admission.yearbalance < 0) { %>
+          <option value="<%= admission.admissionId %>" selected><%= admission.yearbalance %> zł</option>
+          <% } else { %>
+            <option value="<%= admission.admissionId %>"><%= admission.yearbalance %> zł</option>
+        <% } %>
       <% }) %>
     </select>
-  </div>
-
-  <!-- <div>
-    <span class="label label-primary">Primary Label</span>
-  </div> -->
-  <!-- <div class="col-4 d-flex justify-content-center">
-    <button id="search" class="btn btn-warning" type="submit" >Filtruj</button>
   </div> -->
   
 </div>
@@ -45,7 +117,7 @@
 </div>
 
 <div class="d-flex">
-  <div class="justify-content-center">
+  <div class="justify-content-center w-50">
     <label for="type">&nbsp;&nbsp;Rodzaj transakcji</label>
     <select class="custom-select-addtransaction mb-3 fs-4 w-100 text-center" name="type" id="type" style="padding: 6px 12px" aria-placeholder="Rodzaj transakcji">
       <% if (user.level === 3) { %>
@@ -59,14 +131,15 @@
     </select>
   </div>
 
-  <div class="justify-content-center">
+  <div class="justify-content-center w-50">
     <label for="type">&nbsp;&nbsp;Rok akademicki</label>
     <select class="custom-select-addtransaction mb-3 fs-4 w-100 text-center" name="ayear" id="ayear" style="padding: 6px 12px" aria-placeholder="Rok akademicki">
       <option value="0"></option>
       <% admissions.forEach((admission) => { %>  
         <option value="<%= admission.admissionId %>" selected><%= admission.ayear %></option>         
-      <% }) %>
-    </select>
+        <% }) %>
+      </select>
+     
   </div>
 </div>
 
@@ -96,7 +169,13 @@
     <div class="col col-6">
   <% } %>
 
-    <% if ((buttonTitle === 'Zapisz transakcję' && enteredValues.level > 1) || (buttonTitle === 'Zapisz zmiany' && enteredValues.level > 1)) { %>
+  <% if (page == 0) { %>
+    <a href="/"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
+  <% } else if (page == 1) { %>
+    <a href="/profile/id/<%= student.id %>"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
+  <% } %>
+
+    <!-- <% if ((buttonTitle === 'Zapisz transakcję' && enteredValues.level > 1) || (buttonTitle === 'Zapisz zmiany' && enteredValues.level > 1)) { %>
       <a href="/"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
     <% } else if (buttonTitle === 'Zapisz transakcję') { %>
       <a href="/"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
@@ -104,19 +183,211 @@
         <a href="/"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
     <% } else if (buttonTitle === 'Zapisz zmiany') { %>      
       <a href="/"><button class="w-100 btn btn-lg btn-warning" type="button">Wróć</button></a>
-    <% } %>
+    <% } %> -->
   </div>
 </div>
 
-<div id="hiddenField"  style="display: none;" value="<%= enteredValues.resultId %>" name="resultId"></div>
+<!-- <div id="hiddenField"  style="display: none;" value="<%= enteredValues.resultId %>" name="resultId"></div> -->
 <% if (messageerror) { %>
   <h4 class="alert alert-danger text-center text-danger mt-2"><%= messageerror %></h4> 
 <% } %>
 <% if (messagesuccess) { %>
   <h4 class="alert alert-success text-center text-success mt-2"><%= messagesuccess %></h4> 
 <% } %>
-
 <div class="form-floating mb-3 ">
-  <textarea class="col-12 form-control" name="comment" id="comment" rows="10" value="<%= student.comment %>"></textarea>
+  <textarea class="col-12 form-control" name="comment" id="comment" rows="10"><%= student.comment %></textarea>
   <label for="comment">Uwagi:</label>
 </div>
+
+
+<!-- =============================MODAL================================= -->
+<!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button> -->
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Dane do przycisków</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+
+        <!-- =======================PRZYCISK1================================= -->
+    <div>
+      <div class="row justify-content-center">
+        <div class="mb-3 d-flex">
+          <div class="col col-6">
+            <label for="modalbuttontitle1">&nbsp;&nbsp;Tytuł przycisku 1</label>
+            <input type="text" class="form-control fs-6" id="modalbuttontitle1" name="modalbuttontitle1">
+          </div>
+          <div class="col col-6">
+            <label for="modaldesc1">&nbsp;&nbsp;Opis transakcji 1</label>
+            <input type="text" class="form-control fs-6" id="modaldesc1" name="modaldesc1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+        <div>
+          <div class="justify-content-center">
+            <label for="modaltype1">&nbsp;&nbsp;Rodzaj transakcji1</label>
+            <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="modaltype1" id="modaltype1" style="padding: 6px 12px">
+              <% if (user.level === 3) { %>
+                <option value="0">Należność</option>
+              <% } else { %>
+                <option value="" selected></option>
+                <option value="0">Należność</option>
+                <option value="1">Wpłata</option>
+                <option value="3">Zwrot</option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex">
+          <div class="mb-3 w-50"> 
+            <label for="modalamount1">&nbsp;&nbsp;Kwota transakcji1</label>
+            <input type="number" class="form-control fs-6 text-center" id="modalamount1" name="modalamount1" step=".01">
+          </div>
+          
+          <div class="mb-3 w-50"> 
+            <label for="modaldate1">&nbsp;&nbsp;Data transakcji1</label>
+            <input type="date" class="form-control text-center fs-6" id="modaldate1" name="modaldate1">
+          </div>
+        
+        </div>
+
+
+        <hr class="text-danger">
+        
+
+        <!-- =======================PRZYCISK2================================= -->
+    <div>
+      <div class="row justify-content-center">
+        <div class="mb-3 d-flex">
+          <div class="col col-6">
+            <label for="modalbuttontitle2">&nbsp;&nbsp;Tytuł przycisku 2</label>
+            <input type="text" class="form-control fs-6" id="modalbuttontitle2" name="modalbuttontitle2">
+          </div>
+          <div class="col col-6">
+            <label for="modaldesc1">&nbsp;&nbsp;Opis transakcji 2</label>
+            <input type="text" class="form-control fs-6" id="modaldesc2" name="modaldesc2">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+        <div>
+          <div class="justify-content-center">
+            <label for="modaltype2">&nbsp;&nbsp;Rodzaj transakcji2</label>
+            <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="modaltype2" id="modaltype2" style="padding: 6px 12px">
+              <% if (user.level === 3) { %>
+                <option value="0">Należność</option>
+              <% } else { %>
+                <option value="" selected></option>
+                <option value="0">Należność</option>
+                <option value="1">Wpłata</option>
+                <option value="3">Zwrot</option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex">
+          <div class="mb-3 w-50"> 
+            <label for="modalamout2">&nbsp;&nbsp;Kwota transakcji2</label>
+            <input type="number" class="form-control fs-6 text-center" id="modalamount2" name="modalamount2" step=".01">
+          </div>
+          
+          <div class="mb-3 w-50"> 
+            <label for="modaldate2">&nbsp;&nbsp;Data transakcji2</label>
+            <input type="date" class="form-control text-center fs-6" id="modaldate2" name="modaldate2">
+          </div>
+        
+        </div>
+
+
+        <hr class="text-danger">
+
+        <!-- =======================PRZYCISK3================================= -->
+    <div>
+      <div class="row justify-content-center">
+        <div class="mb-3 d-flex">
+          <div class="col col-6">
+            <label for="modalbuttontitle3">&nbsp;&nbsp;Tytuł przycisku 3</label>
+            <input type="text" class="form-control fs-6" id="modalbuttontitle3" name="modalbuttontitle3">
+          </div>
+          <div class="col col-6">
+            <label for="modaldesc3">&nbsp;&nbsp;Opis transakcji 3</label>
+            <input type="text" class="form-control fs-6" id="modaldesc3" name="modaldesc3">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+        <div>
+          <div class="justify-content-center">
+            <label for="modaltype3">&nbsp;&nbsp;Rodzaj transakcji3</label>
+            <select class="custom-select-addtransaction mb-3 fs-6 w-100 text-center" name="modaltype3" id="modaltype3" style="padding: 6px 12px">
+              <% if (user.level === 3) { %>
+                <option value="0">Należność</option>
+              <% } else { %>
+                <option value="" selected></option>
+                <option value="0">Należność</option>
+                <option value="1">Wpłata</option>
+                <option value="3">Zwrot</option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex">
+          <div class="mb-3 w-50"> 
+            <label for="modalamount3">&nbsp;&nbsp;Kwota transakcji3</label>
+            <input type="number" class="form-control fs-6 text-center" id="modalamount3" name="modalamount3" step=".01">
+          </div>
+          
+          <div class="mb-3 w-50"> 
+            <label for="modaldate3">&nbsp;&nbsp;Data transakcji3</label>
+            <input type="date" class="form-control text-center fs-6" id="modaldate3" name="modaldate3">
+          </div>
+        
+        </div>
+
+
+
+        <!-- <div class="mb-3">
+          <label for="modaldesc-2">&nbsp;&nbsp;Opis transakcji 2</label>
+          <input type="text" class="form-control fs-6" id="modaldesc-2" name="modaldesc-2">
+        </div>
+        <div class="mb-3">
+          <label for="modaldesc-3">&nbsp;&nbsp;Opis transakcji 3</label>
+          <input type="text" class="form-control fs-6" id="modaldesc-3" name="modaldesc-3">
+        </div>
+      </div>
+       -->
+      <div class="modal-footer">
+        <!-- <div class="row w-100">
+          <button type="button" class="btn btn-success" id="modalgetdata">Pobierz dane</button>
+        </div> -->
+        <div class="row w-100 d-flex justify-content-evenly">
+            <div class="col col-6 p-0 text-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+          </div>
+          <div class="col col-6 p-0 text-center">
+            <button type="button" class="btn btn-primary" id="modalsave" data-bs-dismiss="modal">Zapisz</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- =================================================================== -->

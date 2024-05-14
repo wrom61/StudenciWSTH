@@ -1,7 +1,8 @@
 const express = require('express')
-const authController = require('../controllers/auth')
+// const authController = require('../controllers/auth')
 const pagesController = require('../controllers/pages')
 const middleware = require('../middlewares/middlewares')
+const usefulFunctions = require('../controllers/functions')
 const router = express.Router();
 
 // router.get('/login', raportController.showLoginPage)
@@ -16,7 +17,9 @@ router.post('/', middleware.isLoggedIn, pagesController.find)
 
 // router.post('/profile', middleware.isLoggedIn, pagesController.findAyearTransactions)
 
-router.get('/register', middleware.isLoggedIn, pagesController.showRegisterPage)
+router.get('/register', middleware.isLoggedIn, usefulFunctions.admissionFields,  pagesController.showRegisterPage)
+
+router.get('/:id', middleware.isLoggedIn, pagesController.deleteUser)
 
 //==========================================================
 
@@ -26,6 +29,6 @@ router.get('/', middleware.isLoggedIn, pagesController.showStudentList)
 
 
 
-router.get('/:id', middleware.isLoggedIn, pagesController.deleteUser)
+
 
 module.exports = router;

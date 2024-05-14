@@ -11,11 +11,133 @@ const db = mysql.createConnection({
   database: process.env.DATABASE
 })
 
+// GET ADMISSION DETAILS (EDIT ADMISSION)
+// DELETE ADMISSION
+// DELETE TRANSACTION
 // SALDA POSZCZEGÓLNYCH LAT AKADEMICKICH
 // STUDENT ADMISSIONS FROM STUDENTS LIST PAGE
-// STUDENT TRANSACTIONS
+// STUDENT FILTERED TRANSACTIONS FROM STUDENTS LIST PAGE
+// STUDENTS DATA FROM TRANSACTIONID
 // STUDENTS DATA
 // ISLOGGEDIN
+
+
+//===================GET ADMISSION DETAILS=========================
+exports.getAdmissionDetails = async (req, res, next) => {
+  // console.log("Query: ", req.query);
+  // console.log('Params: ', req.params);  
+  
+  try {
+    db.query('SELECT * FROM admissions WHERE admissionId = ?', [req.params.id], async (error, results) => {      
+      if(error) {
+        console.log(error);
+        // req.messages = {
+        //   messagesuccess: '',
+        //   messageerror: 'Błąd połączenia z bazą danych!'
+        // }
+        next()
+      } else {  
+        db.query('SELECT id, first_name, last_name FROM users WHERE id = ?', [results[0].studentId], async (err, studentname) => {
+          if(err) {
+            console.log(err);            
+          } else {
+            req.studentname = studentname[0]
+            req.admissiondetails = results[0]
+
+            // console.log(studentname[0])
+            // console.log(results[0])
+            
+            // req.messages = {
+            //   messagesuccess: 'Transakcja została usunięta!',
+            //   messageerror: ''}        
+            next()
+          }
+        })
+      }
+    })    
+ 
+  } catch (er) {
+    console.log(er);   
+    // req.messages = {
+    //   messagesuccess: '',
+    //   messageerror: 'Błąd połączenia z bazą danych!'
+    // }
+    next() 
+  }
+}
+
+//==================DELETE ADMISSION===========================
+exports.deleteAdmission = async (req, res, next) => {
+  try {
+    db.query('SELECT id FROM transactions WHERE admissionId = ?', [req.params.admissionId], async (er, result) => {
+      if(er) {
+        console.log(er)      
+      } else {
+        // console.log(result);
+        if(result.length > 0) {
+          req.messages = {
+            messagesuccess: '',
+            messageerror: 'Nie można usunąć zapisu, który zawiera transakcje!'
+          }
+          return next()
+        }
+        db.query('UPDATE admissions SET status = ? WHERE admissionId = ?', [0, req.params.admissionId], async (erro) => {
+          if(erro) {
+            console.log(erro)
+            req.messages = {
+              messagesuccess: '',
+              messageerror: 'Błąd połączenia z bazą danych!'
+            }
+            return next()
+          } else {
+            req.messages = {
+              messagesuccess: 'Zapis został usunięty!',
+              messageerror: ''}        
+            return next()
+          }
+        })
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    req.messages = {
+      messagesuccess: '',
+      messageerror: 'Błąd połączenia z bazą danych!'
+    }
+    next() 
+  }
+}
+
+//===================DELETE TRANSACTION=========================
+exports.deleteTransaction = async (req, res, next) => {
+  // console.log("Query: ", req.query);
+  // console.log('Params: ', req.params);  
+  
+  try {
+    db.query('UPDATE transactions SET status = ? WHERE id = ?', [0, req.params.transId], async (error) => {      
+      if(error) {
+        console.log(error);
+        req.messages = {
+          messagesuccess: '',
+          messageerror: 'Błąd połączenia z bazą danych!'
+        }
+        next()
+      } else {  
+        req.messages = {
+          messagesuccess: 'Transakcja została usunięta!',
+          messageerror: ''}        
+        next()
+      }
+    })    
+  } catch (er) {
+    console.log(er);   
+    req.messages = {
+      messagesuccess: '',
+      messageerror: 'Błąd połączenia z bazą danych!'
+    }
+    next() 
+  }
+}
 
 
 //============SALDA POSZCZEGÓLNYCH LAT AKADEMICKICH==============
@@ -29,14 +151,15 @@ let totalBalance = 0
 try {
   
   for (let i = 0; i < req.zapisy.length; i++) {
-  db.query("SELECT SUM(amount) AS yearbalance FROM transactions WHERE idstudent = ? AND admissionId = ?", [req.student.id, req.zapisy[i].admissionId], async (e, balance) => {
+  db.query("SELECT SUM(amount) AS yearbalance FROM transactions WHERE idstudent = ? AND admissionId = ? AND status = ?", [req.student.id, req.zapisy[i].admissionId, 1], async (e, balance) => {
     if(balance[0].yearbalance === null) {balance[0].yearbalance = 0}
-    console.log('Balance', balance[0].yearbalance);
+    // console.log('Balance', balance[0].yearbalance);
     // console.log(req.student.id);
     // console.log(req.zapisy[i].admissionId);
     // console.log(db.query.toStrin);
     // console.log(balance[0].yearbalance);
     totalBalance += balance[0].yearbalance;
+    totalBalance = parseFloat(totalBalance.toFixed(2))
     // console.log(balance);
     // balance[i] = {
     //   ['yearbalance']: balance[i],
@@ -60,8 +183,7 @@ try {
     // return next()
   } catch (error) {
     console.log(error);  
-  }
-   
+  }   
 }
 
 //============STUDENT ADMISSIONS FROM STUDENTS LIST PAGE===========
@@ -70,7 +192,7 @@ exports.StudentAdmissions = async (req, res, next) => {
   // console.log("Req.param in admissions: ", req.params);
   // console.log("Req.body in admissions: ", req.body);
 
-  db.query('SELECT * FROM admissions INNER JOIN academicyears on admissions.academicyearId = academicyears.id INNER JOIN institute on admissions.instytutId = institute.instituteId INNER JOIN branches on admissions.branchId = branches.branchId INNER JOIN level on admissions.levelId = level.levelId WHERE admissions.studentId = ? ORDER BY academicyears.id', [req.params.id], async (err, admissions) => {
+  db.query('SELECT * FROM admissions INNER JOIN academicyears on admissions.academicyearId = academicyears.id INNER JOIN institute on admissions.instytutId = institute.instituteId INNER JOIN branches on admissions.branchId = branches.branchId INNER JOIN level on admissions.levelId = level.levelId WHERE admissions.studentId = ? AND status = ? ORDER BY academicyears.id', [req.params.id, 1], async (err, admissions) => {
     //  console.log("Rowssss", await admissions)
     //  console.log(admissions.length);
      
@@ -104,15 +226,18 @@ exports.StudentAdmissions = async (req, res, next) => {
     req.zapisy = []
     next()
   }
-    });    
+    })
 }
 
-//============STUDENT TRANSACTIONS FROM STUDENTS LIST PAGE===========
+//============STUDENT FILTERED TRANSACTIONS FROM STUDENTS LIST PAGE===========
 exports.StudentTransactions = async (req, res, next) => {
   const status = 1; //1 - aktywne; 0 - skasowane
-  let ay = ''
-  // console.log("Req.params.id in transactions: ", typeof(req.query.ayear));
-  // console.log('Tu nie dochodzę????');
+  // console.log("@@@", req.student);
+  // req.student.id = req.params.studentId
+  
+  let ay = []
+  // console.log("Req.params.id in transactions: ", req.query.ayear);
+  // console.log('Req.body in transactions from students list page', req.body);
 
 if(req.query.ayear > 0 && typeof(req.query.ayear) != undefined) {
   // console.log('jestem turrr');
@@ -122,6 +247,9 @@ if(req.query.ayear > 0 && typeof(req.query.ayear) != undefined) {
     ay = academicyear[0].academicyear
   })
 }
+
+// const ay = await usefulFunctions.getStudentsAcademicYears(req.query.ayear)
+// console.log(ay);
 
 let query = ''
 let array = []
@@ -175,9 +303,10 @@ if(req.query.ayear == 0 || req.query.ayear == undefined) {
                     ['totalIncome']: totalIncomeAmount,
                     ['rawTotal']: totalRawAmount,
                     ['id']: rows[i].id,
-                    ['academicyear']: ay}                   
+                    ['academicyear']: ay,
+                    ['ayear']: req.query.ayear}                   
         }
-        console.log('Rowsas: ', rows);
+        // console.log('Filtered rows: ', rows);
         
         req.trans = rows      
         return next()           
@@ -198,6 +327,7 @@ if(req.query.ayear == 0 || req.query.ayear == undefined) {
     }
     });    
 }
+
 
 ////===============STUDENTS DATA FROM TRANSACTIONID==========================
 exports.studentDataFromTransactionId = async (req, res, next) => {
@@ -257,7 +387,7 @@ exports.studentData = async (req, res, next) => {
           })
         }        
         req.student = result[0]
-        // console.log(req.student);
+        // console.log("Czy tu student jest?", req.student);
         return next()
       })
     } catch (error) {
@@ -273,10 +403,14 @@ exports.studentData = async (req, res, next) => {
 
 ////===============ISLOGGEDIN=========================================
 exports.isLoggedIn = async (req, res, next) => {
+
   // const db = dbCon.dbConnection()
-//  console.log(req.cookies);
-// console.log('req.body w IsLoggedIn: ', req.body);
-// console.log('req.user w IsLoggedIn: ', req.user);
+  //  console.log("Reqqq: ", req);
+  // console.log('req.params w IsLoggedIn: ', req.params);
+  // console.log('req.user w IsLoggedIn: ', req.user);
+  // return
+  // console.log(usefulFunctions.encryption(5));
+   
 
   if(req.cookies.jwt) {
     try {
@@ -286,24 +420,27 @@ exports.isLoggedIn = async (req, res, next) => {
       // console.log(decoded);
       // 2. Check if the user still exists
       db.query('SELECT * FROM users WHERE id = ?', [decoded.id], (error, result) => {
-        // console.log(result);
+        // console.log(result[0].id);
         if(!result) {
           return res.status(401).render('login', {
-            message: '',
+            message: 'Błąd podczas połączenia z bazą danych!',
             pageTitle: 'Logowanie',
-            user: []  
+            user: [],
           })
-          // return next()
-        }
+     
+        } 
         req.user = result[0]
-        // console.log("result in isLoggedIn: ", result[0].level);
+        // console.log("result in isLoggedIn: ", result[0]);
         
         if(result[0].level === 1) {
           req.student = result[0]
         } else {
           req.student = {}
         }
-
+        req.messages = {
+          messageerror: '',
+          messagesuccess: ''
+        }
         // console.log("Req.student z isLoggedIn: ", req.student);        
         return next()
       })
@@ -312,7 +449,7 @@ exports.isLoggedIn = async (req, res, next) => {
       return res.status(401).render('login', {
         message: '',
         pageTitle: 'Logowanie',
-        user: []  
+        user: []
       })
       // return next()
     }

@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const { promisify } = require('util')
 // const raportController = require('./pages')
 const usefulFunctions = require('./functions')
-const sqlquery = require('./sqlqueries')
+// const sqlquery = require('./sqlqueries')
 // const db = require('../db/db')
 // db.dbConnection();
 const db = mysql.createConnection({
@@ -14,8 +14,13 @@ const db = mysql.createConnection({
   database: process.env.DATABASE
 })
 
+// PASSWORD CHANGE
 // SHOW ADDTRANSACTION PAGE
 // ADD TRANSACTION
+// SAVE NEW ADMISSION
+// SHOW ADMISSION PAGE
+// SAVE EDITED ADMISSION
+// SHOW EDIT ADMISSION PAGE
 // SHOW VIEW TRANSACTION PAGE
 // SHOW ADD ADMISSION PAGE
 // SAVE NEW ADMISSION
@@ -24,10 +29,78 @@ const db = mysql.createConnection({
 // REGISTER STUDENT INTO DATABASE
 // SHOW EDIT STUDENT PAGE
 // EDIT STUDENT
+// DELETE TRANSACTION
+
+//==============PASSWORD CHANIGE==================
+exports.passwordChange = async (req, res) => {
+// console.log('Jestem w pass', req.body);
+
+const { modalpreviouspassword, modalnewpassword, modalnewpasswordconfirmation } = req.body
+
+try {
+  if( !modalpreviouspassword || !modalnewpassword || !modalnewpasswordconfirmation ) {
+    return res.status(200).render('error', {
+      message: 'Wprowadź e-mail i hasło!',
+      user: req.user,
+      pageTitle: "Błąd!"
+    })
+  }  
+  
+
+  db.query('SELECT password FROM users WHERE id = ?', [req.user.id], async (error, results) => {
+    // console.log('Results', results); 
+    // console.log('Resultsss', results[0].password);           
+    if(results.length === 0 || !(await bcrypt.compare(modalpreviouspassword, results[0].password))) {
+      return res.status(401).render('error', {
+        message: 'Poprzednie hasło użytkownika jest niepoprawne!',
+        user: req.user,
+        pageTitle: "Błąd!"
+      })
+    } else if (modalnewpassword != modalnewpasswordconfirmation) {
+      return res.status(401).render('error', {
+        message: 'Nowe hasło i jego powtórzenie nie są takie same!',
+        user: req.user,
+        pageTitle: "Błąd!"
+      })
+    } else if (modalnewpassword == modalpreviouspassword) {
+      return res.status(401).render('error', {
+        message: 'Stare i nowe hasło są takie same!',
+        user: req.user,
+        pageTitle: "Błąd!"
+      })
+    } else {
+      // console.log('OKKKK');
+      
+      let hashedPassword = await bcrypt.hash(modalnewpassword, 8)
+
+      db.query("UPDATE users SET password = ? WHERE id = ?", [hashedPassword, req.user.id], async (err) => {
+        if (err) throw err;
+     
+      });  
+      
+        res.status(200).render(`profile`, {
+          user: req.user,
+          student: req.student,
+          messageerror: '',
+          messagesuccess: 'Hasło zostało zmienione!',
+          pageTitle: 'Karta studenta',
+          trans: req.trans, 
+          admissions: req.zapisy
+        })
+    }
+  })
+
+
+} catch (error) {
+  console.log(error);
+  
+}
+
+}
 
 //==============SHOW ADDTRANSACTION PAGE=========
 exports.showAddTransactionPage = async (req, res) => {
-  console.log("Zapisy w showAddTransactionPage", req.zapisy);
+  // console.log("Zapisy w showAddTransactionPage", req.zapisy);
 
   // console.log(req.user);
   
@@ -43,11 +116,11 @@ exports.showAddTransactionPage = async (req, res) => {
   }
  
 
-  console.log('Params at showAddTransactionPage', await req.zapisy);
+  // console.log('Params at showAddTransactionPage', await req.zapisy);
   // console.log('tb', req.tb);
   
-  console.log('Czy jestem w addtransaction?');
-  console.log("Insert ID: ", req.params.id);
+  // console.log('Czy jestem w addtransaction?');
+  // console.log("Insert ID: ", req.params.id);
   
   try {
     // console.log('REQ.USER.LEVEL w renderowaniu ADDTRANSACTION', req.user.level);
@@ -74,8 +147,11 @@ exports.showAddTransactionPage = async (req, res) => {
           },
           student: req.student,
           admissions: req.zapisy,
-          totalBalance: req.tb
+          totalBalance: req.tb,
+          page: req.params.p
         })
+        // console.log("Student5", req.student);
+        
       } else {
         res.redirect('/login')
       }  
@@ -87,9 +163,9 @@ exports.showAddTransactionPage = async (req, res) => {
 
 //==============ADD TRANSACTION=================
 exports.addtransaction = async (req, res) => {
-  console.log("req.body in AddTransaction: ", req.body);
-  console.log('req.params in AddTransaction: ', req.params);
-  console.log('req.student in AddTransaction: ', req.zapisy);
+  // console.log("req.body in AddTransaction: ", req.body);
+  // console.log('req.params in AddTransaction: ', req.params);
+  // console.log('req.student in AddTransaction: ', req.zapisy);
   
   //  return
   
@@ -117,7 +193,8 @@ const { description, amount, date, type, ayear } = req.body
     },
     student: req.student,
     admissions: req.zapisy,
-    totalBalance: req.tb
+    totalBalance: req.tb,
+    page: req.params.p
   })
 }  
 
@@ -178,7 +255,8 @@ db.query('SELECT MAX(id) FROM transactions', async (error, maxId) => {
           },
           student: req.student,
           admissions: req.zapisy,
-          totalBalance: req.tb
+          totalBalance: req.tb,
+          page: req.params.p
         })
     }
     
@@ -193,6 +271,12 @@ db.query('SELECT MAX(id) FROM transactions', async (error, maxId) => {
       transType = 3
       transAmount = amount * -1
     }
+
+    db.query("UPDATE users SET comment = ? WHERE id = ?", [req.body.comment, req.student.id], async (err, comment) => {
+      if (err) throw err;
+      // console.log(comment);
+      req.student.comment = req.body.comment
+    });
 
     const todaysDate = new Date();
     const fd = usefulFunctions.formatDate(todaysDate)
@@ -219,12 +303,14 @@ db.query('SELECT MAX(id) FROM transactions', async (error, maxId) => {
          },
          student: req.student,
          admissions: req.zapisy,
-         totalBalance: req.tb
+         totalBalance: req.tb,
+         page: req.params.p
        })
     
      } else {
       //  console.log("Rezultaty w addTransaction", results.insertId); 
       //  console.log("Req.user po zapisaniu transakcji: ", req.user.id);
+      //  console.log("Student8", req.student);
        
        return res.status(200).render('addtransaction', {
          messagesuccess: 'Transakcja została pomyślnie zarejestrowana!',
@@ -242,7 +328,8 @@ db.query('SELECT MAX(id) FROM transactions', async (error, maxId) => {
          },
          student: req.student,
          admissions: req.zapisy,
-         totalBalance: req.tb
+         totalBalance: req.tb,
+         page: req.params.p
        })
      }
     }) 
@@ -250,6 +337,7 @@ db.query('SELECT MAX(id) FROM transactions', async (error, maxId) => {
   })
 })
 }
+
 ////=======================SAVE NEW ADMISSION=====================
 exports.addAdmission = async (req, res) => {
   // console.log(req.body);
@@ -263,11 +351,12 @@ exports.addAdmission = async (req, res) => {
   
   if (!ayears || !institutes || !branches || !levels ) {
    blad = true
-    console.log("Nie wpisano wszystkich pól");
+    // console.log("Nie wpisano wszystkich pól");
       return res.status(200).render('addadmission', {
         messageerror: 'Wypełnij wszystkie pola formularza!',
         messagesuccess: '',
         pageTitle: 'Zapis studenta',
+        buttonTitle: 'Zapisz',
         user: req.user,
         studentId: req.params.id,
         studentfirstname: req.params.first_name,
@@ -276,7 +365,8 @@ exports.addAdmission = async (req, res) => {
         institutes: req.fields.institutes,
         branches: req.fields.branches,
         levels: req.fields.levels,
-        markers: req.fields.markers
+        markers: req.fields.markers,
+        admissiondetails: {}
       })    
   }
   
@@ -292,6 +382,7 @@ exports.addAdmission = async (req, res) => {
           messageerror: 'Błąd podczas zapisu do bazy danych!',
           messagesuccess: '',
           pageTitle: 'Zapis studenta',
+          buttonTitle: 'Zapisz',
           user: req.user,
           studentId: req.params.id,
           studentfirstname: req.params.first_name,
@@ -300,7 +391,8 @@ exports.addAdmission = async (req, res) => {
           institutes: req.fields.institutes,
           branches: req.fields.branches,
           levels: req.fields.levels,
-          markers: req.fields.markers
+          markers: req.fields.markers,
+          admissiondetails: {}
         })
     } 
     else {
@@ -308,6 +400,7 @@ exports.addAdmission = async (req, res) => {
         messageerror: '',
         messagesuccess: 'Zapis został zarejestrowany!',
         pageTitle: 'Zapis studenta',
+        buttonTitle: 'Zapisz',
         user: req.user,
         studentId: req.params.id,
         studentfirstname: req.params.first_name,
@@ -316,7 +409,8 @@ exports.addAdmission = async (req, res) => {
         institutes: req.fields.institutes,
         branches: req.fields.branches,
         levels: req.fields.levels,
-        markers: req.fields.markers
+        markers: req.fields.markers,
+        admissiondetails: {}
       })
       }
     }) 
@@ -326,12 +420,13 @@ exports.addAdmission = async (req, res) => {
   
   ////=======================SHOW ADMISSION PAGE=====================
   exports.showAddAdmission = (req, res) => {
-   console.log('params in show: ', req.params);
+  //  console.log('params in show: ', req.params);
   //  console.log(req.fields);
       return res.status(200).render('addadmission', {
       messageerror: '',
       messagesuccess: '',
       pageTitle: 'Zapis studenta',
+      buttonTitle: 'Zapisz',
       user: req.user,
       studentId: req.params.id,
       studentfirstname: req.params.first_name,
@@ -340,15 +435,137 @@ exports.addAdmission = async (req, res) => {
       institutes: req.fields.institutes,
       branches: req.fields.branches,
       levels: req.fields.levels,
-      markers: req.fields.markers
+      markers: req.fields.markers,
+      admissiondetails: {}
     })
   }
   
+  ////=======================SAVE EDITED ADMISSION=====================
+exports.saveEditedAdmission = async (req, res) => {
+  // console.log(req.params);
+  // console.log("Tu: ", req.body);
+  let blad = false
+  // console.log("AD", req.admissiondetails);
+  // return
+  const { ayears, institutes, branches, levels, markers, index } = req.body
+  // const id = req.params.id
+  // console.log("Id studenta edycja transakcji: ", transactionId);
+  
+  if (!ayears || !institutes || !branches || !levels ) {
+   blad = true
+    // console.log("Nie wpisano wszystkich pól");
+      return res.status(200).render('editadmission', {
+        messageerror: 'Wypełnij wszystkie pola formularza!',
+        messagesuccess: '',
+        pageTitle: 'Edycja zapisu',
+        buttonTitle: 'Zapisz zmiany',
+        user: req.user,
+        studentId: req.studentname.id,
+        studentfirstname: req.studentname.first_name,
+        studentlastname: req.studentname.last_name,
+        ayears: req.fields.ayears, 
+        institutes: req.fields.institutes,
+        branches: req.fields.branches,
+        levels: req.fields.levels,
+        markers: req.fields.markers,
+        admissionId: req.params.id,
+        admissiondetails: req.admissiondetails
+      })    
+  }
+  
+  if (blad === false) {
+    const todaysDate = new Date();
+    const fd = usefulFunctions.formatDate(todaysDate)
+    let resign = 0
+    if(req.body.resignation) {resign = 1}
+
+
+
+    db.query('UPDATE admissions SET academicyearId = ?, instytutId = ?, branchId = ?, levelId = ?, Indexnumber = ?, resignation = ?, markeriD = ?, admissionModifiedById = ?, admissionModifiedDate = ? WHERE admissionId = ?', [ayears, institutes, branches, levels, index, resign, markers, req.user.id, fd, req.params.id], async (error) => {
+      
+    if(error) {
+      console.log("er: ", error); 
+        return res.status(200).render('editadmission', {
+          messageerror: 'Błąd podczas zapisu do bazy danych!',
+          messagesuccess: '',
+          pageTitle: 'Edycja zapisu',
+          buttonTitle: 'Zapisz zmiany',
+          user: req.user,
+          studentId: req.studentname.id,
+          studentfirstname: req.studentname.first_name,
+          studentlastname: req.studentname.last_name,
+          ayears: req.fields.ayears, 
+          institutes: req.fields.institutes,
+          branches: req.fields.branches,
+          levels: req.fields.levels,
+          markers: req.fields.markers,
+          admissionId: req.params.id,
+          admissiondetails: req.admissiondetails
+        })
+    } 
+    else {
+      // const { ayears, institutes, branches, levels, markers, index } = req.body
+      req.admissiondetails.academicyearId  = ayears
+      req.admissiondetails.instytutId  = institutes
+      req.admissiondetails.branchId  = branches
+      req.admissiondetails.levelId  = levels
+      req.admissiondetails.markerId  = markers
+      req.admissiondetails.Indexnumber  = index
+      req.admissiondetails.resignation = resign
+      
+      // console.log("ADD", req.admissiondetails);
+    // usefulFunctions.admissionFields();
+
+        return res.status(200).render('editadmission', {
+          messageerror: '',
+          messagesuccess: 'Zapis został zmieniony!',
+          pageTitle: 'Edycja zapisu',
+          buttonTitle: 'Zapisz zmiany',
+          user: req.user,
+          studentId: req.studentname.id,
+          studentfirstname: req.studentname.first_name,
+          studentlastname: req.studentname.last_name,
+          ayears: req.fields.ayears, 
+          institutes: req.fields.institutes,
+          branches: req.fields.branches,
+          levels: req.fields.levels,
+          markers: req.fields.markers,
+          admissionId: req.params.id,
+          admissiondetails: req.admissiondetails
+        })
+     
+      }
+    }) 
+  }
+  }
+ 
+////=======================SHOW EDIT ADMISSION PAGE=====================
+exports.showEditAdmissionPage = (req, res) => {
+  //  console.log('params in show: ', req.params);
+  //  console.log(req.student);
+      return res.status(200).render('editadmission', {
+      messageerror: '',
+      messagesuccess: '',
+      pageTitle: 'Edycja zapisu',
+      buttonTitle: 'Zapisz zmiany',
+      user: req.user,
+      studentId: req.admissiondetails.studentId,
+      studentfirstname: req.studentname.first_name,
+      studentlastname: req.studentname.last_name,
+      ayears: req.fields.ayears, 
+      institutes: req.fields.institutes,
+      branches: req.fields.branches,
+      levels: req.fields.levels,
+      markers: req.fields.markers,
+      admissionId: req.params.id,
+      admissiondetails: req.admissiondetails
+    })
+  }
 
 ////===================SHOW VIEW TRANSACTION PAGE======================
 exports.viewTransaction = async (req, res) => {
-    console.log('reqqq', req.params.id);
-    console.log('Student: ', req.student);
+    // console.log('reqqq', req.params.id);
+    // console.log('Student: ', req.student);
     
   // console.log("Stuenta id: ", req.params.studentId);
   // console.log("Studenta lastname: ", req.params.first_name);
@@ -369,7 +586,7 @@ exports.viewTransaction = async (req, res) => {
       } else if (results[0].transactionType === 3) {
         type = 'Zwrot'
       }    
-      console.log('req.studenttt: ', req.user);
+      // console.log('req.studenttt: ', req.user);
       
       res.render('viewtransaction', {
         transData: results,
@@ -399,7 +616,7 @@ exports.login = async (req, res) => {
 
     if( !userNick || !password ) {
       return res.status(400).render('login', {
-        message: 'Wprowadź e-mail i hasło!',
+        message: 'Wprowadź nazwę użytkownika i hasło!',
         pageTitle: 'Logowanie',
         user: []
       })
@@ -466,6 +683,7 @@ exports.register = async (req, res) => {
   let first_name = req.body.first_name
   let last_name = req.body.last_name
   let email = req.body.email
+  let gender = req.body.gender
   let userNick = req.body.userNick
   let password = req.body.password
   let password1 = req.body.password1
@@ -505,6 +723,7 @@ exports.register = async (req, res) => {
           last_name,
           userNick,
           email,
+          gender,
           password,
           password1,
           address1,
@@ -541,6 +760,7 @@ exports.register = async (req, res) => {
           last_name,
           userNick,
           email,
+          gender,
           password,
           password1,
           address1,
@@ -570,6 +790,7 @@ exports.register = async (req, res) => {
           last_name,
           userNick,
           email,
+          gender,
           password,
           password1,
           address1,
@@ -604,7 +825,7 @@ exports.register = async (req, res) => {
       ba = req.body.branch
     }
       
-    db.query('INSERT INTO users SET ?', {first_name: first_name, last_name: last_name, userNick: userNick, email: email, password: hashedPassword, address1: address1, zipCode1: zipcode1, town1: town1, address2: address2, zipCode2: zipcode2, town2: town2, phone: phone, comment: comment, userCreatedBy: req.user.id, userCreatedDate: fd, level: level, instituteId_access: ia, branchId_access: ba}, async (error, results) => {
+    db.query('INSERT INTO users SET ?', {first_name: first_name, last_name: last_name, userNick: userNick, email: email, gender: gender, password: hashedPassword, address1: address1, zipCode1: zipcode1, town1: town1, address2: address2, zipCode2: zipcode2, town2: town2, phone: phone, comment: comment, userCreatedBy: req.user.id, userCreatedDate: fd, level: level, instituteId_access: ia, branchId_access: ba}, async (error, results) => {
       if(error) {
         console.log(error);
       } else {
@@ -628,7 +849,7 @@ exports.register = async (req, res) => {
 exports.showEditStudent = async (req, res) => {
   // console.log('edit', req.params);
   
-  db.query(sqlquery.qSelectUserById, [req.params.id], async (error, studentData) => {
+  db.query('SELECT * FROM users WHERE id = ?', [req.params.id], async (error, studentData) => {
     // console.log("StudentData in SHOW EDIT STUDENT: ", studentData);
   
     if(error) {
@@ -642,7 +863,10 @@ exports.showEditStudent = async (req, res) => {
         formTitle: "Edycja studenta",
         buttonTitle: "Wprowadź zmiany",
         regist: 0,
-        student: studentData[0]
+        student: studentData[0],
+        institutes: req.fields.institutes,
+        branches: req.fields.branches,
+        levels: req.fields.levels,
       })
       // console.log('Student data: ', studentData[0]);
     }    
@@ -655,6 +879,7 @@ exports.editStudent = async (req, res, next) => {
   let first_name = req.body.first_name
   let last_name = req.body.last_name
   let email = req.body.email
+  let gender = req.body.gender
   let userNick = req.body.userNick
   let address1 = req.body.address1
   let zipcode1 = req.body.zipcode1
@@ -684,7 +909,7 @@ exports.editStudent = async (req, res, next) => {
     })
   }
   
-  db.query(sqlquery.qSelectIdByUserNick, [userNick], async (error, results) => {
+  db.query("SELECT userNick FROM users WHERE userNick = ?", [userNick], async (error, results) => {
     if(error) {
       console.log(error);      
     }
@@ -705,13 +930,13 @@ exports.editStudent = async (req, res, next) => {
       } 
 
 
-      db.query(sqlquery.qSelectByUserNick, [req.student.id], async (error, results) => {
+      db.query("SELECT id, userNick, level, instituteId_access, branchId_access FROM users WHERE id = ?", [req.student.id], async (error, results) => {
         if(error) {
           console.log(error);      
         }
         // console.log(results.length, await results[0], req.student.id, req.student.userNick, userNick);      
         
-    console.log("czy to resutl?", results[0]);
+    // console?.log("czy to resutl?", results[0]);
     previous_level = await results[0].level
     previous_ia = await results[0].instituteId_access
     previous_ba = await results[0].branchId_access
@@ -724,6 +949,8 @@ exports.editStudent = async (req, res, next) => {
     let level = 0
     let ia = 0
     let ba = 0
+    // console.log(req.user.level, previous_level, req.body.level);
+    
     if(req.user.level < 4) {
       level = previous_level
       ia = previous_ia
@@ -735,11 +962,11 @@ exports.editStudent = async (req, res, next) => {
     }
     // console.log(sqlquery.qUpdateUser);
     
-    db.query(sqlquery.qUpdateUser, [first_name, last_name, email, userNick, address1, address2, zipcode1, zipcode2, town1, town2, phone, comment, req.user.id, fd, level, ia, ba, req.student.id], async (error, userData) => {
+    db.query('UPDATE users SET first_name = ?, last_name = ?, email = ?, gender = ?, userNick = ?, address1 = ?, address2 = ?, zipCode1 = ?, zipCode2 = ?, town1 = ?, town2 = ?, phone = ?, comment = ?, userModifiedBy = ?, userModifiedDate = ?, level = ?, instituteId_access = ?, branchId_access = ? WHERE id = ?', [first_name, last_name, email, gender, userNick, address1, address2, zipcode1, zipcode2, town1, town2, phone, comment, req.user.id, fd, level, ia, ba, req.student.id], async (error, userData) => {
       if(!userData) {
         console.log(error);
       } else {
-        db.query(sqlquery.qSelectUserByUserNick, [userNick], (e, resultss) => {
+        db.query('SELECT * FROM users WHERE userNick = ?', [userNick], (e, resultss) => {
           if(!resultss) {
             console.log(e);
           } else {
@@ -753,6 +980,58 @@ exports.editStudent = async (req, res, next) => {
     })
   })  
 }
+
+////=======================DELETE TRANSACTION========================
+// exports.deleteTransaction = async (req, res) => {
+//   console.log('Delete transaction params: ', req.student); 
+        
+//   db.query('UPDATE transactions SET status = ? WHERE id = ?', [0, req.params.id], async (error, results) => {
+//     // db.query('DELETE FROM users WHERE id = ?', [req.params.id], async (error, results) => {
+//     if(error) {
+//       console.log(error);
+//     } else {  
+
+//       const status = 1; //1 - aktywne; 0 - skasowane
+    
+//       db.query('SELECT * FROM transactions WHERE status = ? AND idstudent = ? ORDER BY date', [status, req.params.studentId], async (err, rows) => {
+//         //  console.log("Rows in selectTransactions: ", rows)
+//       if(!err) {
+
+//         if(await rows.length > 0) {
+//           const newTotalNumber = usefulFunctions.totalAmount(rows)
+//           const totalRawAmount = usefulFunctions.totalRawAmount(rows)   
+
+//           for(let i=0; i<rows.length; i++) {
+//             const newAmountNumber = usefulFunctions.formatAmount(rows[i].amount)          
+            
+//             let formattedDate = usefulFunctions.formatDate(rows[i].date)           
+//             rows[i]= {['formatedDate']: formattedDate,
+//                       ['document']: rows[i].document,
+//                       ['amount']: newAmountNumber,
+//                       ['total']: newTotalNumber,
+//                       ['rawTotal']: totalRawAmount,
+//                       ['id']: rows[i].id}
+//           }
+//         }          
+//           //console.log('Rows in DELETE TRANS: ', rows);
+//           //console.log('Req.params.Id: ', req.params.studentId);          
+//           res.status(200).render('profile', {
+//             pageTitle: 'Karta studenta',
+//             user: req.user,
+//             student: req.student,
+//             admissions: req.zapisy,
+//             trans: rows,
+//             // studentData: {
+//             //   studentId: req.params.studentId,
+//             //   first_name: req.params.first_name,
+//             //   last_name: req.params.last_name
+//             // },
+//           })
+//         }         
+//       })
+//     }
+//   })
+// }
 
 
 //=====================================================================
@@ -888,61 +1167,61 @@ exports.editStudent = async (req, res, next) => {
 //     });    
 // }
 
-////=======================DELETE TRANSACTION========================
-exports.deleteTransaction = async (req, res) => {
-  console.log('Delete transaction params: ', req.params); 
+// ////=======================DELETE TRANSACTION========================
+// exports.deleteTransaction = async (req, res) => {
+//   console.log('Delete transaction params: ', req.params); 
         
-  db.query('UPDATE transactions SET status = ? WHERE id = ?', [0, req.params.id], async (error, results) => {
-    // db.query('DELETE FROM users WHERE id = ?', [req.params.id], async (error, results) => {
-    if(error) {
-      console.log(error);
-    } else {  
+//   db.query('UPDATE transactions SET status = ? WHERE id = ?', [0, req.params.id], async (error, results) => {
+//     // db.query('DELETE FROM users WHERE id = ?', [req.params.id], async (error, results) => {
+//     if(error) {
+//       console.log(error);
+//     } else {  
 
-      const status = 1; //1 - aktywne; 0 - skasowane
+//       const status = 1; //1 - aktywne; 0 - skasowane
     
-      db.query('SELECT * FROM transactions WHERE status = ? AND idstudent = ? ORDER BY date', [status, req.params.studentId], async (err, rows) => {
-        //  console.log("Rows in selectTransactions: ", rows)
-      if(!err) {
+//       db.query('SELECT * FROM transactions WHERE status = ? AND idstudent = ? ORDER BY date', [status, req.params.studentId], async (err, rows) => {
+//         //  console.log("Rows in selectTransactions: ", rows)
+//       if(!err) {
 
-        if(await rows.length > 0) {
-          const newTotalNumber = usefulFunctions.totalAmount(rows)
-          const totalRawAmount = usefulFunctions.totalRawAmount(rows)   
+//         if(await rows.length > 0) {
+//           const newTotalNumber = usefulFunctions.totalAmount(rows)
+//           const totalRawAmount = usefulFunctions.totalRawAmount(rows)   
 
-          for(let i=0; i<rows.length; i++) {
-            const newAmountNumber = usefulFunctions.formatAmount(rows[i].amount)          
+//           for(let i=0; i<rows.length; i++) {
+//             const newAmountNumber = usefulFunctions.formatAmount(rows[i].amount)          
             
-            let formattedDate = usefulFunctions.formatDate(rows[i].date)           
-            rows[i]= {['formatedDate']: formattedDate,
-                      ['document']: rows[i].document,
-                      ['amount']: newAmountNumber,
-                      ['total']: newTotalNumber,
-                      ['rawTotal']: totalRawAmount,
-                      ['id']: rows[i].id}
-          }
-        }          
-          //console.log('Rows in DELETE TRANS: ', rows);
-          //console.log('Req.params.Id: ', req.params.studentId);          
-          res.status(200).render('profile', {
-            pageTitle: 'Karta studenta',
-            user: req.user,
-            studentData: {
-              studentId: req.params.studentId,
-              first_name: req.params.first_name,
-              last_name: req.params.last_name
-            },
-            trans: rows,
-          })
-        }         
-      })
-    }
-  })
-}
+//             let formattedDate = usefulFunctions.formatDate(rows[i].date)           
+//             rows[i]= {['formatedDate']: formattedDate,
+//                       ['document']: rows[i].document,
+//                       ['amount']: newAmountNumber,
+//                       ['total']: newTotalNumber,
+//                       ['rawTotal']: totalRawAmount,
+//                       ['id']: rows[i].id}
+//           }
+//         }          
+//           //console.log('Rows in DELETE TRANS: ', rows);
+//           //console.log('Req.params.Id: ', req.params.studentId);          
+//           res.status(200).render('profile', {
+//             pageTitle: 'Karta studenta',
+//             user: req.user,
+//             studentData: {
+//               studentId: req.params.studentId,
+//               first_name: req.params.first_name,
+//               last_name: req.params.last_name
+//             },
+//             trans: rows,
+//           })
+//         }         
+//       })
+//     }
+//   })
+// }
 
 
 ////=======================ENTER EDIT TRANSACTION=====================
 exports.editTransaction = async (req, res) => {
-  console.log("req.body edit: ", req.body);
-  console.log('req.params edit: ', req.params);
+  // console.log("req.body edit: ", req.body);
+  // console.log('req.params edit: ', req.params);
   
   const transactionId = req.params.id
   const studentId = req.params.studentId

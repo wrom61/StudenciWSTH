@@ -20,7 +20,7 @@ submitButton.addEventListener("click", setLocalStorage)
 function getUserNickFromLocalStorage() {
   const userNick = localStorage.getItem('login')
   const pass = localStorage.getItem('pass')
-  console.log(userNick);
+  // console.log(userNick);
   
   if(userNick) {
     loginNick.value = userNick;

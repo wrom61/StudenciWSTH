@@ -5,7 +5,7 @@
     <div class="mx-auto col-md-10 col-lg-7">
 
       
-      <form action="/auth/addadmission/id/<%= studentId %>/sfn/<%= studentfirstname %>/sln/<%= studentlastname %>/ayears/<%= ayears %>/institutes/<%= institutes %>/branches/<%= branches %>/levels/<%= levels %>" method="POST" class="p-3 p-md-4 border rounded-3 bg-light">
+      <form action="/auth/editadmission/id/<%= admissionId %>" method="POST" class="p-3 p-md-4 border rounded-3 bg-light">
         
         <%- include('./partials/admissionform') %> 
    
@@ -28,7 +28,8 @@
   function textChange() {
     const val = alert ? alert.hidden = true : '';
   }
- 
+ const changePasswordButton = document.querySelector('#changepasswordbutton')
+ const savePasswordChangeButton = document.querySelector('#savepasswordchangebutton')
   //=====================================================
   //==============MODAL===================================
 const button1 = document.querySelector('#button1')

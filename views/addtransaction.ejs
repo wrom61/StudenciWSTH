@@ -4,7 +4,7 @@
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
   <div class="row align-items-center g-lg-5 py-0">
     <div class="mx-auto col-md-10 col-lg-7">
-      <form action="/auth/addtransaction/id/<%= student.id %>" method="POST" class="p-4 p-md-4 border rounded-3 bg-light">
+      <form action="/auth/addtransaction/id/<%= student.id %>/p/<%= page %>" method="POST" class="p-4 p-md-4 border rounded-3 bg-light">
 
         <%- include('./partials/transaction') %>        
       </form>
@@ -14,7 +14,8 @@
 </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-  <script>
+  
+<script>
    
     let alert = document.querySelector('.alert');
 
@@ -30,13 +31,179 @@
     let sel2 = document.querySelector('#yearbalance');
 // let options2 = sel2.querySelectorAll('option');
 
-function giveSelection(selValue) {
-    sel2.value = selValue
+  function giveSelection(selValue) {
+      sel2.value = selValue
+  }
+//=====================================================
+let amount = document.querySelector('#amount')
+const description = document.querySelector('#description')
+const type = document.querySelector('#type')
+const date = document.querySelector('#date')
+const ayear = document.querySelector('#ayear')
+const balanceyear = document.querySelector('#balanceyear')
+
+function amountLostFocus () {
+  amount.value = parseFloat(amount.value).toFixed(2)  
+}
+amount.addEventListener('blur', amountLostFocus );
+amount.addEventListener("focus", () =>  amount.select())
+
+function formatDate(d) { 
+  let year = d.toLocaleString("default", { year: "numeric" });
+  let month = d.toLocaleString("default", { month: "2-digit" });
+  let day = d.toLocaleString("default", { day: "2-digit" });
+  return  year + "-" + month + "-" + day;
 }
 
+//=====================================================
+//==============MODAL===================================
+const button1 = document.querySelector('#button1')
+const button2 = document.querySelector('#button2')  
+const button3 = document.querySelector('#button3')
+button1.textContent = localStorage.getItem("modalbuttontitle1")
+button2.textContent = localStorage.getItem("modalbuttontitle2")
+button3.textContent = localStorage.getItem("modalbuttontitle3")
 
-// document.getElementById('#yearbalance').value = '28'
-  </script>
+function modalbutton1click() {
+  description.value = localStorage.getItem('modaldescription1')
+  type.value = localStorage.getItem('modaltype1')
+  date.value = localStorage.getItem('modaldate1')
+  amount.value = localStorage.getItem('modalamount1')
+}
+button1.addEventListener('click', modalbutton1click)
+
+function modalbutton2click() {
+  description.value = localStorage.getItem('modaldescription2')
+  type.value = localStorage.getItem('modaltype2')
+  date.value = localStorage.getItem('modaldate2')
+  amount.value = localStorage.getItem('modalamount2')
+}
+button2.addEventListener('click', modalbutton2click)
+
+function modalbutton3click() {
+  description.value = localStorage.getItem('modaldescription3')
+  type.value = localStorage.getItem('modaltype3')
+  date.value = localStorage.getItem('modaldate3')
+  amount.value = localStorage.getItem('modalamount3')
+}
+button3.addEventListener('click', modalbutton3click)
+
+// const modalMain = document.querySelector('#exampleModal')
+const saveModal = document.querySelector('#modalsave')
+
+const modaldescription1 = document.querySelector('#modaldesc1')
+const modaltitle1 = document.querySelector('#modalbuttontitle1')
+const modaltype1 = document.querySelector('#modaltype1')
+const modalamount1 = document.querySelector('#modalamount1')
+const modaldate1 = document.querySelector('#modaldate1')
+
+const modaldescription2 = document.querySelector('#modaldesc2')
+const modaltitle2 = document.querySelector('#modalbuttontitle2')
+const modaltype2 = document.querySelector('#modaltype2')
+const modalamount2 = document.querySelector('#modalamount2')
+const modaldate2 = document.querySelector('#modaldate2')
+
+const modaldescription3 = document.querySelector('#modaldesc3')
+const modaltitle3 = document.querySelector('#modalbuttontitle3')
+const modaltype3 = document.querySelector('#modaltype3')
+const modalamount3 = document.querySelector('#modalamount3')
+const modaldate3 = document.querySelector('#modaldate3')
+// const modalgetdata = document.querySelector('#modalgetdata')
+
+modaldescription1.value = localStorage.getItem('modaldescription1')
+modaltitle1.value = localStorage.getItem('modalbuttontitle1')
+modaltype1.value = localStorage.getItem('modaltype1')
+modalamount1.value = localStorage.getItem('modalamount1')
+modaldate1.value = localStorage.getItem('modaldate1')
+
+modaldescription2.value = localStorage.getItem('modaldescription2')
+modaltitle2.value = localStorage.getItem('modalbuttontitle2')
+modaltype2.value = localStorage.getItem('modaltype2')
+modalamount2.value = localStorage.getItem('modalamount2')
+modaldate2.value = localStorage.getItem('modaldate2')
+
+modaldescription3.value = localStorage.getItem('modaldescription3')
+modaltitle3.value = localStorage.getItem('modalbuttontitle3')
+modaltype3.value = localStorage.getItem('modaltype3')
+modalamount3.value = localStorage.getItem('modalamount3')
+modaldate3.value = localStorage.getItem('modaldate3')
+
+saveModal.addEventListener('click', saveModalData)
+// modalgetdata.addEventListener('click', getModalData)
+
+
+function saveModalData() {
+  localStorage.setItem('modaldescription1', modaldescription1.value )
+  localStorage.setItem('modalbuttontitle1', modaltitle1.value )
+  localStorage.setItem('modaltype1', modaltype1.value )
+  localStorage.setItem('modalamount1', modalamount1.value )
+  localStorage.setItem('modaldate1', modaldate1.value )
+
+  localStorage.setItem('modaldescription2', modaldescription2.value )
+  localStorage.setItem('modalbuttontitle2', modaltitle2.value )
+  localStorage.setItem('modaltype2', modaltype2.value )
+  localStorage.setItem('modalamount2', modalamount2.value )
+  localStorage.setItem('modaldate2', modaldate2.value )
+
+  localStorage.setItem('modaldescription3', modaldescription3.value )
+  localStorage.setItem('modalbuttontitle3', modaltitle3.value )
+  localStorage.setItem('modaltype3', modaltype3.value )
+  localStorage.setItem('modalamount3', modalamount3.value )
+  localStorage.setItem('modaldate3', modaldate3.value )
+
+  button1.textContent = modaltitle1.value
+  button2.textContent = modaltitle2.value
+  button3.textContent = modaltitle3.value
+  }
+
+// function getButtonsTitles() {
+//   button1.value = localStorage.getItem('modalbuttontitle1')
+//   button2.value = localStorage.getItem('modalbuttontitle2')
+//   button3.value = localStorage.getItem('modalbuttontitle3')
+// }
+
+function modalamount1LostFocus () {
+  modalamount1.value = parseFloat(modalamount1.value).toFixed(2)  
+}
+function modalamount2LostFocus () {
+  modalamount2.value = parseFloat(modalamount2.value).toFixed(2)  
+}
+function modalamount3LostFocus () {
+  modalamount3.value = parseFloat(modalamount3.value).toFixed(2)  
+}
+modalamount1.addEventListener('blur', modalamount1LostFocus );
+modalamount1.addEventListener("focus", () => modalamount1.select())
+modalamount2.addEventListener('blur', modalamount2LostFocus );
+modalamount2.addEventListener("focus", () => modalamount2.select())
+modalamount3.addEventListener('blur', modalamount3LostFocus );
+modalamount3.addEventListener("focus", () => modalamount3.select())
+
+// function getModalData() {
+//   modaldescription1.value = localStorage.getItem('modaldescription1')
+//   modaltitle1.value = localStorage.getItem('modalbuttontitle1')
+//   modaltype1.value = localStorage.getItem('modaltype1')
+//   // modalayear1.value = localStorage.getItem('modalayear1')
+//   modalamount1.value = localStorage.getItem('modalamount1')
+//   modaldate1.value = localStorage.getItem('modaldate1')
+
+//   modaldescription2.value = localStorage.getItem('modaldescription2')
+//   modaltitle2.value = localStorage.getItem('modalbuttontitle2')
+//   modaltype2.value = localStorage.getItem('modaltype2')
+//   // modalayear2.value = localStorage.getItem('modalayear2')
+//   modalamount2.value = localStorage.getItem('modalamount2')
+//   modaldate2.value = localStorage.getItem('modaldate2')
+
+//   modaldescription3.value = localStorage.getItem('modaldescription3')
+//   modaltitle3.value = localStorage.getItem('modalbuttontitle3')
+//   modaltype3.value = localStorage.getItem('modaltype3')
+//   // modalayear3.value = localStorage.getItem('modalayear3')
+//   modalamount3.value = localStorage.getItem('modalamount3')
+//   modaldate3.value = localStorage.getItem('modaldate3')
+// }
+
+// const cat = localStorage.getItem("myCat");
+// localStorage.setItem("myCat", "Tom");
+</script>
 
 
 

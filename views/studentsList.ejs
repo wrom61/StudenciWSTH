@@ -85,10 +85,10 @@
         <% } %>
       
         <td class="text-end" style="width: 150">
-          <a href="/auth/addtransaction/id/<%= student.id %>" type="button" class="btn btn-light btn-small" data-button="view" data-title="Dodaj transakcję" style="width: 40"><i class="bi bi-database-add"></i></a>
+          <a href="/auth/addtransaction/id/<%= student.id %>/p/0" type="button" class="btn btn-light btn-small" data-button="view" data-title="Dodaj transakcję" style="width: 40"><i class="bi bi-database-add"></i></a>
           <a href="/profile/id/<%= student.id %>" type="button" class="btn btn-light btn-small" data-button="transactions" data-title="Zobacz transakcje studenta" style="width: 40"><i class="bi bi-database"></i></a>
           <a href="/auth/editstudent/id/<%= student.id %>" type="button" class="btn btn-light btn-small" data-button="edit" data-title="Edytuj studenta" style="width: 40"><i class="bi bi-pencil"></i></a>
-          <a href="/auth/addadmission/id/<%= student.id %>/sfn/<%= student.first_name %>/sln/<%= student.last_name %>" type="button" class="btn btn-light btn-small" data-button="addacademicyear" data-title="Dodaj zapis" style="width: 40"><i class="bi bi-file-plus"></i></a>
+          <!-- <a href="/auth/addadmission/id/<%= student.id %>/sfn/<%= student.first_name %>/sln/<%= student.last_name %>" type="button" class="btn btn-light btn-small" data-button="addacademicyear" data-title="Dodaj zapis" style="width: 40"><i class="bi bi-file-plus"></i></a> -->
           <a href="/<%= student.id %>" type="button" class="btn btn-light btn-small" data-button="delete" data-title="Usuń studenta" style="width: 40" type="submit" onclick="return checkdelete()"><i class="bi bi-person-x"></i></a>
         </td>
       </tr>
@@ -103,65 +103,20 @@
 
 </div>
 </div>
-<!-- </div> -->
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <script src="/scripts/studentsList.js"></script>
 <script>
-  const ln = document.querySelector('#searchField_ln');
-  const fn = document.querySelector('#searchField_fn');
-  const ad = document.querySelector('#searchField_ad');
-  const alertSuccess = document.querySelector('.alert-success')
-  
 
-  document.addEventListener('keydown', function(event) {
-   if(event.keyCode == 27) {
-     ln.value = '';
-     fn.value = '';
-     ad.value = '';
-     alertSuccess.remove();
-     ln.focus();
+let alert1 = document.querySelector('.alert');
+    if(alert1) {
+      setTimeout(() => {
+        alert1.hidden = true
+      }, 4000)
     }
-});
-
-function checkdelete() {
-  return confirm('Czy na pewno usunąć tego studenta?')
-}
-
-ln.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault()
-    document.getElementById("searchFieldButton").click();
-  }
-})
-ln.addEventListener("focus", () =>  ln.select())
-
-fn.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault()
-    document.getElementById("searchFieldButton").click();
-  }
-})
-fn.addEventListener("focus", () =>  fn.select())
-
-ad.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault()
-    document.getElementById("searchFieldButton").click();
-  }
-})
-ad.addEventListener("focus", () =>  ad.select())  
-
-let alert = document.querySelector('.alert');
-
-[...document.querySelectorAll('.form-control')].forEach(function(item) {
-item.addEventListener('input', textChange)
-})
-
-function textChange() {
-  const val = alert ? alert.hidden = true : '';
-}
+   
 
 </script>
 </body>
