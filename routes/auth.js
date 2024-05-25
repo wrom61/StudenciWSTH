@@ -14,7 +14,7 @@ router.get('/addtransaction/id/:id/p/:p', middleware.isLoggedIn, middleware.stud
 
 router.get('/logout', authController.logout)
 
-router.post('/register', middleware.isLoggedIn, authController.register)
+router.post('/register', middleware.isLoggedIn,  usefulFunctions.admissionFields, authController.register)
 
 router.get('/editstudent/id/:id', middleware.isLoggedIn, usefulFunctions.admissionFields, authController.showEditStudent)
 

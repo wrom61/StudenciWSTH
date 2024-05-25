@@ -4,7 +4,6 @@ const mysql = require('mysql')
 const dotenv = require('dotenv')
 const cookieParser = require('cookie-parser')
 const expressLayouts = require('express-ejs-layouts')
-// const connectDB = require('./db/db')
 
 dotenv.config({ path: './.env'})
 
@@ -21,12 +20,18 @@ app.use(expressLayouts)
 
 app.set('view engine', 'ejs')
 
-// connectDB.dbConnection();
+const db = mysql.createConnection({
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE
+})
+
 // const db = mysql.createConnection({
-//   host: process.env.DATABASE_HOST,
-//   user: process.env.DATABASE_USER,
-//   password: process.env.DATABASE_PASSWORD,
-//   database: process.env.DATABASE
+//   host: 'localhost',
+//   user: 'mgebel_studenci',
+//   password: 'K2MmGmEth1',
+//   database: 'mgebel_studenci'
 // })
 
 // db.connect(error => {
@@ -35,10 +40,6 @@ app.set('view engine', 'ejs')
 //   } else {
 //     console.log('MYSQL Connected...');    
 //   }  
-// })
-
-// app.get('*', (req, res) => {
-//   res.status(404).render('404')
 // })
 
 app.listen(process.env.PORT, () => {console.log(`Server started on port ${process.env.PORT}`)})

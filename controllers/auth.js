@@ -2,17 +2,21 @@ const mysql = require('mysql')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const { promisify } = require('util')
-// const raportController = require('./pages')
 const usefulFunctions = require('./functions')
-// const sqlquery = require('./sqlqueries')
-// const db = require('../db/db')
-// db.dbConnection();
+
 const db = mysql.createConnection({
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE
 })
+
+// const db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'mgebel_studenci',
+//   password: 'K2MmGmEth1',
+//   database: 'mgebel_studenci'
+// })
 
 // PASSWORD CHANGE
 // SHOW ADDTRANSACTION PAGE
@@ -614,57 +618,67 @@ exports.login = async (req, res) => {
   try {
     const { userNick, password } = req.body
 
-    if( !userNick || !password ) {
+    if( !userNick || !password ) {      
       return res.status(400).render('login', {
         message: 'Wprowadź nazwę użytkownika i hasło!',
         pageTitle: 'Logowanie',
         user: []
       })
-    }    
-    // console.log(userNick);
+    } 
     
-    db.query('SELECT * FROM users WHERE userNick = ?', [userNick], async (error, results) => {
-      // console.log('Results', results); 
-      // console.log('Resultsss', results[0].password);           
-      if(results.length === 0 || !(await bcrypt.compare(password, results[0].password))) {
-        return res.status(401).render('login', {
-          message: 'Nazwa użytkownika lub hasło są niepoprawne!',
-          pageTitle: 'Logowanie',
-          user: []
-        })
-      } else {
-        const id = results[0].id
-        const token = jwt.sign({ id }, process.env.JWT_SECRET, {
-          expiresIn: process.env.JWT_EXPIRES_IN
-        })
-        // console.log("Token is", token);
-        if (results.level === 1) {
-          req.student = results[0]
-        } else {
-          req.student = []
-        }
+      const sql = `SELECT * FROM users WHERE userNick = ?`    
+      db.query(sql, [userNick], async (error, results) => { 
+        // console.log('R:', sql);        
+        // console.log('Resultsss', results[0].last_name );  
 
-        const cookieOptions = {
-          expires: new Date(
-            Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
-            httpOnly: true
-        }
-        res.cookie('jwt', token, cookieOptions)
-        
-        if(results[0].level === 1) {
-          res.status(200).render('index', {
-            user: results[0],
-            student: req.student,
-            pageTitle: 'Strona główna'
+        if(error) {
+          console.log(error);        
+        } else if(results[0].length == 0 || !( await bcrypt.compare(password, results[0].password))) {
+          return res.status(401).render('login', {
+            message: 'Nazwa użytkownika lub hasło są niepoprawne!',
+            pageTitle: 'Logowanie',
+            user: []
           })
         } else {
-          res.status(200).redirect('/')
-        }
-      }
-    })
+          const id = results[0].id
+          const token = jwt.sign({ id }, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES_IN
+          })
+          // console.log("Token is", token);
+          if (results[0].level == 1) {
+            req.student = results[0]
+          } else {
+            req.student = []
+          }
+  
+          const cookieOptions = {
+            expires: new Date(
+              Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000),
+              httpOnly: true
+          }
+          res.cookie('jwt', token, cookieOptions)
+          
+          if(results[0].level == 1) {
+            return res.status(200).render('index', {
+              user: results[0],
+              student: req.student,
+              pageTitle: 'Strona główna'
+            })
+          } else {
+            res.status(200).redirect('/')
+          }
+        } 
+      })
+
   } catch (error) {
-    console.log(error);    
-  }
+    console.log(error); 
+    console.log('2');
+    return res.status(400).render('login', {
+      message: "Błąd!",
+      pageTitle: 'Logowanie',
+      user: []
+    })  
+  } 
 }
 
 
@@ -674,7 +688,7 @@ exports.logout = async (req, res) => {
   expires: new Date(Date.now() + -2*1000),  
   httpOnly: true  
   })  
-  res.status(200).redirect('/');  
+    res.status(200).redirect('/');  
   }
 
 
@@ -698,6 +712,8 @@ exports.register = async (req, res) => {
   let level = 1
   let ia = 0
   let ba = 0
+  // console.log(req);
+  
   // if(req.user.level < 4) {
     
    
@@ -738,6 +754,9 @@ exports.register = async (req, res) => {
           ia,
           ba
         },
+        institutes: req.institutes,
+          branches: req.branches,
+          levels: req.levels
     })
   }
   
@@ -775,6 +794,9 @@ exports.register = async (req, res) => {
           ia,
           ba
         },
+        institutes: req.fields.institutes,
+          branches: req.fields.branches,
+          levels: req.fields.levels
       })
     } else if ( password !== password1) {
       return res.render('register', {
@@ -805,6 +827,9 @@ exports.register = async (req, res) => {
           ia,
           ba
         },
+        institutes: req.fields.institutes,
+          branches: req.fields.branches,
+          levels: req.fields.levels
       })
     }
 
@@ -838,7 +863,10 @@ exports.register = async (req, res) => {
           buttonTitle: "Zarejestruj",
           user: req.user,
           regist: 1,
-          student: []
+          student: [],
+          institutes: req.fields.institutes,
+          branches: req.fields.branches,
+          levels: req.fields.levels
         })
       }
     })
@@ -1451,3 +1479,6 @@ console.log("Show edit transaction page", req.params);
 //     })
 //   })  
 // }
+
+// }  
+// })

@@ -8,6 +8,13 @@ const db = mysql.createConnection({
   database: process.env.DATABASE
 })
 
+// const db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'mgebel_studenci',
+//   password: 'PMfvJAvjfpMPJCddUea7',
+//   database: 'mgebel_studenci'
+// })
+
 // SHOW PROFILE PAGE
 // SEARCH/FIND STUDENT
 // SHOW REGISTER PAGE

@@ -27,13 +27,16 @@
     <h4 class="text-warning"><%= user.first_name %> <%= user.last_name %> (<%= user.level %>)</h4>
     <% } %>
     <ul>
+      <!-- <li><a href="/register">Rejestracja</a></li> -->
       <% if ( !user ) { %>
+        <!-- <li><a href="/register">Rejestracja</a></li> -->
         <!-- <li><a href="/">Główna</a></li>
         <li><a href="/register">Rejestracja</a></li>
         <li><a href="/login">Logowanie</a></li> 
         <li><a href="/profile">Dane</a></li>
         <li style="background-color: red; border-radius: 15px; padding-left: 2px; padding-right: 4px;"><a href="/auth/logout">Wyloguj</a></li> -->
       <% } else if ( user.level < 3 ) { %>
+        <!-- <li><a href="/register">Rejestracja</a></li> -->
         <!-- <li><a href="/">Główna</a></li> -->
         <!-- <li><a href="/register">Rejestracja</a></li> -->
         <!-- <li><a href="/profile">Dane</a></li> -->

@@ -11,6 +11,20 @@ const db = mysql.createConnection({
   database: process.env.DATABASE
 })
 
+// db.connect(error => {
+//   if(error) {
+//     console.log(error);
+//   } else {
+    // console.log('MYSQL Connected...');    
+
+
+// const db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'mgebel_studenci',
+//   password: 'PMfvJAvjfpMPJCddUea7',
+//   database: 'mgebel_studenci'
+// })
+
 // GET ADMISSION DETAILS (EDIT ADMISSION)
 // DELETE ADMISSION
 // DELETE TRANSACTION
@@ -411,6 +425,7 @@ exports.isLoggedIn = async (req, res, next) => {
   // return
   // console.log(usefulFunctions.encryption(5));
    
+// console.log('Jestem w IsLoggedIn');
 
   if(req.cookies.jwt) {
     try {
@@ -463,3 +478,6 @@ exports.isLoggedIn = async (req, res, next) => {
     // next()
   }
 }
+
+// }  
+// })
